@@ -198,18 +198,18 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 </Label>
               </div>
             </RadioGroup>
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-4 pt-4 justify-center">
               <Button
                 variant="outline"
                 onClick={handleBack}
-                className="flex-1 py-6 text-base"
+                className="w-32 py-6 text-base"
                 disabled={step === 1}
               >
                 Back
               </Button>
               <Button
                 onClick={handleNext}
-                className="flex-1 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
+                className="w-32 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
               >
                 Continue
               </Button>
@@ -261,17 +261,17 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 </Label>
               </div>
             </RadioGroup>
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-4 pt-4 justify-center">
               <Button
                 variant="outline"
                 onClick={handleBack}
-                className="flex-1 py-6 text-base"
+                className="w-32 py-6 text-base"
               >
                 Back
               </Button>
               <Button
                 onClick={handleNext}
-                className="flex-1 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
+                className="w-32 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
               >
                 Continue
               </Button>
@@ -323,17 +323,17 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 </Label>
               </div>
             </RadioGroup>
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-4 pt-4 justify-center">
               <Button
                 variant="outline"
                 onClick={handleBack}
-                className="flex-1 py-6 text-base"
+                className="w-32 py-6 text-base"
               >
                 Back
               </Button>
               <Button
                 onClick={handleNext}
-                className="flex-1 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
+                className="w-32 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
               >
                 Continue
               </Button>
@@ -385,17 +385,17 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 </Label>
               </div>
             </RadioGroup>
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-4 pt-4 justify-center">
               <Button
                 variant="outline"
                 onClick={handleBack}
-                className="flex-1 py-6 text-base"
+                className="w-32 py-6 text-base"
               >
                 Back
               </Button>
               <Button
                 onClick={handleNext}
-                className="flex-1 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
+                className="w-32 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
               >
                 Continue
               </Button>
@@ -418,17 +418,17 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 className="py-6 text-base text-center w-[70%]"
               />
             </div>
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-4 pt-4 justify-center">
               <Button
                 variant="outline"
                 onClick={handleBack}
-                className="flex-1 py-6 text-base"
+                className="w-32 py-6 text-base"
               >
                 Back
               </Button>
               <Button
                 onClick={handleNext}
-                className="flex-1 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
+                className="w-32 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
               >
                 Continue
               </Button>

@@ -6,6 +6,7 @@ import WhyUs from "@/components/WhyUs";
 import Stats from "@/components/Stats";
 import Reviews from "@/components/Reviews";
 import ContactCTA from "@/components/ContactCTA";
+import CTABar from "@/components/CTABar";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -19,6 +20,7 @@ const Index = () => {
       <Stats />
       <Reviews />
       <ContactCTA />
+      <CTABar />
       <Footer />
     </div>
   );

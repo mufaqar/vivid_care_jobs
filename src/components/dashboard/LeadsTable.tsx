@@ -178,6 +178,13 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
     urgent: TagIcon,
   };
 
+  const tagColors: Record<string, string> = {
+    called: "#6E8CFB",
+    spam: "#FE7743",
+    urgent: "#4FB7B3",
+    hot: "#ef4444", // red for hot leads
+  };
+
   const canDelete = isSuperadmin || (isAdmin && canManageCrud);
 
   if (loading) {
@@ -230,8 +237,14 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
                       <div className="flex gap-1 flex-wrap">
                         {tags.map((tagObj, idx) => {
                           const Icon = tagIcons[tagObj.tag];
+                          const bgColor = tagColors[tagObj.tag];
                           return (
-                            <Badge key={idx} variant="secondary" className="flex items-center gap-1">
+                            <Badge 
+                              key={idx} 
+                              variant="secondary" 
+                              className="flex items-center gap-1 text-white"
+                              style={{ backgroundColor: bgColor }}
+                            >
                               {Icon && <Icon className="h-3 w-3" />}
                               <span className="text-xs">{tagObj.tag}</span>
                             </Badge>

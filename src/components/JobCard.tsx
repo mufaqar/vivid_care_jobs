@@ -20,7 +20,7 @@ const JobCard = ({ title, location, type, salary, status = "Active" }: JobCardPr
         </div>
         <span 
           className="px-3 py-1 text-xs font-medium rounded-full"
-          style={isGone ? { backgroundColor: '#FEF3EB', color: '#8B4513' } : {}}
+          style={isGone ? { backgroundColor: '#FCEAF3', color: '#8B4513' } : {}}
           {...(!isGone && { className: "px-3 py-1 bg-success/10 text-success text-xs font-medium rounded-full" })}
         >
           {status}

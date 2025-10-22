@@ -227,12 +227,15 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-1">
+                      <div className="flex gap-1 flex-wrap">
                         {tags.map((tagObj, idx) => {
                           const Icon = tagIcons[tagObj.tag];
-                          return Icon ? (
-                            <Icon key={idx} className="h-4 w-4" />
-                          ) : null;
+                          return (
+                            <Badge key={idx} variant="secondary" className="flex items-center gap-1">
+                              {Icon && <Icon className="h-3 w-3" />}
+                              <span className="text-xs">{tagObj.tag}</span>
+                            </Badge>
+                          );
                         })}
                       </div>
                     </TableCell>

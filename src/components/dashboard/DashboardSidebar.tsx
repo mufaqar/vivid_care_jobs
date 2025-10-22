@@ -51,8 +51,8 @@ export const DashboardSidebar = () => {
                       to={item.url}
                       className={({ isActive }) =>
                         isActive
-                          ? "bg-sidebar-accent text-sidebar-primary hover:bg-sidebar-accent/80"
-                          : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-primary"
+                          ? "bg-sidebar-accent text-sidebar-primary hover:bg-sidebar-accent/80 border-l-4 border-accent shadow-sm font-medium"
+                          : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-primary hover:border-l-4 hover:border-accent/50 border-l-4 border-transparent transition-all duration-200"
                       }
                     >
                       <item.icon className="h-4 w-4 shrink-0" />
@@ -80,8 +80,8 @@ export const DashboardSidebar = () => {
                         to={item.url}
                         className={({ isActive }) =>
                           isActive
-                            ? "bg-sidebar-accent text-sidebar-primary hover:bg-sidebar-accent/80"
-                            : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-primary"
+                            ? "bg-sidebar-accent text-sidebar-primary hover:bg-sidebar-accent/80 border-l-4 border-accent shadow-sm font-medium"
+                            : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-primary hover:border-l-4 hover:border-accent/50 border-l-4 border-transparent transition-all duration-200"
                         }
                       >
                         <item.icon className="h-4 w-4 shrink-0" />

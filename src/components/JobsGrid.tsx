@@ -5,18 +5,18 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
 const jobsData = [
-  { title: "Registered Nurse", location: "London, UK", type: "Full-time", salary: "£30,000 - £40,000" },
-  { title: "Support Worker", location: "Manchester, UK", type: "Part-time", salary: "£20,000 - £25,000" },
-  { title: "Healthcare Assistant", location: "Birmingham, UK", type: "Full-time", salary: "£22,000 - £28,000" },
-  { title: "Care Coordinator", location: "Leeds, UK", type: "Full-time", salary: "£28,000 - £35,000" },
-  { title: "Senior Nurse", location: "Liverpool, UK", type: "Full-time", salary: "£35,000 - £45,000" },
-  { title: "Night Support Worker", location: "Bristol, UK", type: "Night Shift", salary: "£23,000 - £28,000" },
-  { title: "Dementia Care Worker", location: "Newcastle, UK", type: "Full-time", salary: "£24,000 - £30,000" },
-  { title: "Learning Disability Nurse", location: "Sheffield, UK", type: "Full-time", salary: "£32,000 - £38,000" },
-  { title: "Mental Health Support Worker", location: "Nottingham, UK", type: "Full-time", salary: "£25,000 - £30,000" },
-  { title: "Complex Care Nurse", location: "Southampton, UK", type: "Full-time", salary: "£38,000 - £48,000" },
-  { title: "Palliative Care Nurse", location: "Oxford, UK", type: "Part-time", salary: "£30,000 - £38,000" },
-  { title: "Children's Support Worker", location: "Cambridge, UK", type: "Full-time", salary: "£24,000 - £29,000" },
+  { title: "Registered Nurse", location: "London, UK", type: "Full-time", salary: "£30,000 - £40,000", status: "Active" },
+  { title: "Support Worker", location: "Manchester, UK", type: "Part-time", salary: "£20,000 - £25,000", status: "Gone" },
+  { title: "Healthcare Assistant", location: "Birmingham, UK", type: "Full-time", salary: "£22,000 - £28,000", status: "Active" },
+  { title: "Care Coordinator", location: "Leeds, UK", type: "Full-time", salary: "£28,000 - £35,000", status: "Gone" },
+  { title: "Senior Nurse", location: "Liverpool, UK", type: "Full-time", salary: "£35,000 - £45,000", status: "Active" },
+  { title: "Night Support Worker", location: "Bristol, UK", type: "Night Shift", salary: "£23,000 - £28,000", status: "Gone" },
+  { title: "Dementia Care Worker", location: "Newcastle, UK", type: "Full-time", salary: "£24,000 - £30,000", status: "Active" },
+  { title: "Learning Disability Nurse", location: "Sheffield, UK", type: "Full-time", salary: "£32,000 - £38,000", status: "Active" },
+  { title: "Mental Health Support Worker", location: "Nottingham, UK", type: "Full-time", salary: "£25,000 - £30,000", status: "Active" },
+  { title: "Complex Care Nurse", location: "Southampton, UK", type: "Full-time", salary: "£38,000 - £48,000", status: "Active" },
+  { title: "Palliative Care Nurse", location: "Oxford, UK", type: "Part-time", salary: "£30,000 - £38,000", status: "Active" },
+  { title: "Children's Support Worker", location: "Cambridge, UK", type: "Full-time", salary: "£24,000 - £29,000", status: "Active" },
 ];
 
 const JobsGrid = () => {

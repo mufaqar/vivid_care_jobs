@@ -7,17 +7,23 @@ interface JobCardProps {
   location: string;
   type: string;
   salary: string;
+  status?: string;
 }
 
-const JobCard = ({ title, location, type, salary }: JobCardProps) => {
+const JobCard = ({ title, location, type, salary, status = "Active" }: JobCardProps) => {
+  const isGone = status === "Gone";
   return (
     <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-lg transition-all hover:-translate-y-1 duration-300">
       <div className="flex items-start justify-between mb-4">
         <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center p-2">
           <img src={justLogo} alt="Just Healthcare" className="w-full h-full object-contain" />
         </div>
-        <span className="px-3 py-1 bg-success/10 text-success text-xs font-medium rounded-full">
-          Active
+        <span 
+          className="px-3 py-1 text-xs font-medium rounded-full"
+          style={isGone ? { backgroundColor: '#FEF3EB', color: '#8B4513' } : {}}
+          {...(!isGone && { className: "px-3 py-1 bg-success/10 text-success text-xs font-medium rounded-full" })}
+        >
+          {status}
         </span>
       </div>
       

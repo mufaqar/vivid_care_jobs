@@ -11,7 +11,7 @@ interface JobCardProps {
 }
 
 const JobCard = ({ title, location, type, salary, status = "Active" }: JobCardProps) => {
-  const isGone = status === "Gone";
+  const isGone = status === "Filled";
   return (
     <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-lg transition-all hover:-translate-y-1 duration-300">
       <div className="flex items-start justify-between mb-4">

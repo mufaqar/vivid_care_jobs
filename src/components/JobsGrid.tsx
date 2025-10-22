@@ -6,11 +6,11 @@ import { Search } from "lucide-react";
 
 const jobsData = [
   { title: "Registered Nurse", location: "London, UK", type: "Full-time", salary: "£30,000 - £40,000", status: "Active" },
-  { title: "Support Worker", location: "Manchester, UK", type: "Part-time", salary: "£20,000 - £25,000", status: "Gone" },
+  { title: "Support Worker", location: "Manchester, UK", type: "Part-time", salary: "£20,000 - £25,000", status: "Filled" },
   { title: "Healthcare Assistant", location: "Birmingham, UK", type: "Full-time", salary: "£22,000 - £28,000", status: "Active" },
-  { title: "Care Coordinator", location: "Leeds, UK", type: "Full-time", salary: "£28,000 - £35,000", status: "Gone" },
+  { title: "Care Coordinator", location: "Leeds, UK", type: "Full-time", salary: "£28,000 - £35,000", status: "Filled" },
   { title: "Senior Nurse", location: "Liverpool, UK", type: "Full-time", salary: "£35,000 - £45,000", status: "Active" },
-  { title: "Night Support Worker", location: "Bristol, UK", type: "Night Shift", salary: "£23,000 - £28,000", status: "Gone" },
+  { title: "Night Support Worker", location: "Bristol, UK", type: "Night Shift", salary: "£23,000 - £28,000", status: "Filled" },
   { title: "Dementia Care Worker", location: "Newcastle, UK", type: "Full-time", salary: "£24,000 - £30,000", status: "Active" },
   { title: "Learning Disability Nurse", location: "Sheffield, UK", type: "Full-time", salary: "£32,000 - £38,000", status: "Active" },
   { title: "Mental Health Support Worker", location: "Nottingham, UK", type: "Full-time", salary: "£25,000 - £30,000", status: "Active" },

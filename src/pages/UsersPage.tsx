@@ -39,6 +39,8 @@ interface UserWithRole {
   email: string;
   full_name: string | null;
   phone_number: string | null;
+  company_name: string | null;
+  postal_code: string | null;
   created_at: string;
   role?: {
     role: "superadmin" | "admin" | "manager";
@@ -67,6 +69,8 @@ const UsersPage = () => {
           email,
           full_name,
           phone_number,
+          company_name,
+          postal_code,
           created_at,
           role:user_roles(role, can_manage_crud)
         `)
@@ -179,7 +183,7 @@ const UsersPage = () => {
     }
   };
 
-  const handleUpdateProfile = async (userId: string, field: "full_name" | "phone_number", value: string) => {
+  const handleUpdateProfile = async (userId: string, field: "full_name" | "phone_number" | "company_name" | "postal_code", value: string) => {
     try {
       const { error } = await supabase
         .from("profiles")
@@ -267,6 +271,8 @@ const UsersPage = () => {
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
+                  <TableHead>Company</TableHead>
+                  <TableHead>Postcode</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Can Manage CRUD</TableHead>
                   <TableHead>Joined</TableHead>
@@ -276,7 +282,7 @@ const UsersPage = () => {
               <TableBody>
                 {users.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       No users found
                     </TableCell>
                   </TableRow>
@@ -323,6 +329,42 @@ const UsersPage = () => {
                             />
                           ) : (
                             user.phone_number || "—"
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {(isSuperadmin || isAdmin) ? (
+                            <Input
+                              value={user.company_name || ""}
+                              placeholder="Enter company"
+                              onChange={(e) => {
+                                const updatedUsers = users.map(u => 
+                                  u.id === user.id ? { ...u, company_name: e.target.value } : u
+                                );
+                                setUsers(updatedUsers);
+                              }}
+                              onBlur={(e) => handleUpdateProfile(user.id, "company_name", e.target.value)}
+                              className="max-w-[200px]"
+                            />
+                          ) : (
+                            user.company_name || "—"
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {(isSuperadmin || isAdmin) ? (
+                            <Input
+                              value={user.postal_code || ""}
+                              placeholder="Enter postcode"
+                              onChange={(e) => {
+                                const updatedUsers = users.map(u => 
+                                  u.id === user.id ? { ...u, postal_code: e.target.value } : u
+                                );
+                                setUsers(updatedUsers);
+                              }}
+                              onBlur={(e) => handleUpdateProfile(user.id, "postal_code", e.target.value)}
+                              className="max-w-[120px]"
+                            />
+                          ) : (
+                            user.postal_code || "—"
                           )}
                         </TableCell>
                         <TableCell>

@@ -29,6 +29,15 @@ const authSchema = z.object({
     .regex(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/, "Please enter a valid phone number")
     .max(20, "Phone number must be less than 20 characters")
     .optional(),
+  company_name: z.string()
+    .trim()
+    .min(2, "Company name must be at least 2 characters")
+    .max(100, "Company name must be less than 100 characters")
+    .optional(),
+  postal_code: z.string()
+    .trim()
+    .max(20, "Postal code must be less than 20 characters")
+    .optional(),
 });
 
 const Auth = () => {
@@ -36,6 +45,8 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [postalCode, setPostalCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
@@ -63,7 +74,7 @@ const Auth = () => {
     
     // Validate input
     const validationData = isSignUp 
-      ? { email, password, full_name: fullName, phone_number: phoneNumber }
+      ? { email, password, full_name: fullName, phone_number: phoneNumber, company_name: companyName, postal_code: postalCode }
       : { email, password };
     
     const result = authSchema.safeParse(validationData);
@@ -88,6 +99,8 @@ const Auth = () => {
             data: {
               full_name: result.data.full_name || "",
               phone_number: result.data.phone_number || "",
+              company_name: result.data.company_name || "",
+              postal_code: result.data.postal_code || "",
             },
           },
         });
@@ -101,6 +114,8 @@ const Auth = () => {
         setIsSignUp(false);
         setFullName("");
         setPhoneNumber("");
+        setCompanyName("");
+        setPostalCode("");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: result.data.email,
@@ -159,6 +174,28 @@ const Auth = () => {
                     placeholder="+1234567890"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="companyName">Company Name</Label>
+                  <Input
+                    id="companyName"
+                    type="text"
+                    placeholder="ACME Corp"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="postalCode">Postcode</Label>
+                  <Input
+                    id="postalCode"
+                    type="text"
+                    placeholder="SW1A 1AA"
+                    value={postalCode}
+                    onChange={(e) => setPostalCode(e.target.value)}
                     required
                   />
                 </div>

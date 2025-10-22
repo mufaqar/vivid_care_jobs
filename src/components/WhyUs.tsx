@@ -17,7 +17,7 @@ const WhyUs = () => {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <h2 className="text-3xl md:text-4xl font-bold">
-              We Excel in Healthcare Job Recruitment
+              <span style={{ color: '#ED1B7B' }}>We Excel in</span> Healthcare Job Recruitment
             </h2>
             <p className="text-lg opacity-90 leading-relaxed">
               At Vivid Care Recruitment, we're passionate about connecting talented healthcare professionals with rewarding opportunities. Our dedicated team works tirelessly to match your skills with the perfect role.

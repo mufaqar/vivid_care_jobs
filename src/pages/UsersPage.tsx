@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Loader2, Shield, ShieldCheck, User, Trash2, KeyRound } from "lucide-react";
+import { Loader2, Shield, ShieldCheck, User, Trash2, KeyRound, Pencil, Check, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -53,6 +53,13 @@ const UsersPage = () => {
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [editedData, setEditedData] = useState<{
+    full_name: string;
+    phone_number: string;
+    company_name: string;
+    postal_code: string;
+  } | null>(null);
   const { isSuperadmin, isAdmin } = useAuth();
 
   useEffect(() => {
@@ -204,11 +211,28 @@ const UsersPage = () => {
     }
   };
 
-  const handleUpdateProfile = async (userId: string, field: "full_name" | "phone_number" | "company_name" | "postal_code", value: string) => {
+  const handleStartEdit = (user: UserWithRole) => {
+    setEditingUserId(user.id);
+    setEditedData({
+      full_name: user.full_name || "",
+      phone_number: user.phone_number || "",
+      company_name: user.company_name || "",
+      postal_code: user.postal_code || "",
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingUserId(null);
+    setEditedData(null);
+  };
+
+  const handleSaveEdit = async (userId: string) => {
+    if (!editedData) return;
+
     try {
       const { error } = await supabase
         .from("profiles")
-        .update({ [field]: value })
+        .update(editedData)
         .eq("id", userId);
 
       if (error) throw error;
@@ -217,6 +241,10 @@ const UsersPage = () => {
         title: "Profile updated",
         description: "User profile has been successfully updated",
       });
+      
+      setEditingUserId(null);
+      setEditedData(null);
+      fetchUsers();
     } catch (error) {
       toast({
         variant: "destructive",
@@ -310,20 +338,15 @@ const UsersPage = () => {
                 ) : (
                   users.map((user) => {
                     const userRole = getUserRole(user);
+                    const isEditing = editingUserId === user.id;
                     return (
                       <TableRow key={user.id}>
                         <TableCell className="font-medium">
-                          {(isSuperadmin || isAdmin) ? (
+                          {isEditing ? (
                             <Input
-                              value={user.full_name || ""}
+                              value={editedData?.full_name || ""}
                               placeholder="Enter name"
-                              onChange={(e) => {
-                                const updatedUsers = users.map(u => 
-                                  u.id === user.id ? { ...u, full_name: e.target.value } : u
-                                );
-                                setUsers(updatedUsers);
-                              }}
-                              onBlur={(e) => handleUpdateProfile(user.id, "full_name", e.target.value)}
+                              onChange={(e) => setEditedData(prev => prev ? { ...prev, full_name: e.target.value } : null)}
                               className="max-w-[200px]"
                             />
                           ) : (
@@ -335,17 +358,11 @@ const UsersPage = () => {
                         </TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>
-                          {(isSuperadmin || isAdmin) ? (
+                          {isEditing ? (
                             <Input
-                              value={user.phone_number || ""}
+                              value={editedData?.phone_number || ""}
                               placeholder="Enter phone"
-                              onChange={(e) => {
-                                const updatedUsers = users.map(u => 
-                                  u.id === user.id ? { ...u, phone_number: e.target.value } : u
-                                );
-                                setUsers(updatedUsers);
-                              }}
-                              onBlur={(e) => handleUpdateProfile(user.id, "phone_number", e.target.value)}
+                              onChange={(e) => setEditedData(prev => prev ? { ...prev, phone_number: e.target.value } : null)}
                               className="max-w-[150px]"
                             />
                           ) : (
@@ -353,17 +370,11 @@ const UsersPage = () => {
                           )}
                         </TableCell>
                         <TableCell>
-                          {(isSuperadmin || isAdmin) ? (
+                          {isEditing ? (
                             <Input
-                              value={user.company_name || ""}
+                              value={editedData?.company_name || ""}
                               placeholder="Enter company"
-                              onChange={(e) => {
-                                const updatedUsers = users.map(u => 
-                                  u.id === user.id ? { ...u, company_name: e.target.value } : u
-                                );
-                                setUsers(updatedUsers);
-                              }}
-                              onBlur={(e) => handleUpdateProfile(user.id, "company_name", e.target.value)}
+                              onChange={(e) => setEditedData(prev => prev ? { ...prev, company_name: e.target.value } : null)}
                               className="max-w-[200px]"
                             />
                           ) : (
@@ -371,17 +382,11 @@ const UsersPage = () => {
                           )}
                         </TableCell>
                         <TableCell>
-                          {(isSuperadmin || isAdmin) ? (
+                          {isEditing ? (
                             <Input
-                              value={user.postal_code || ""}
+                              value={editedData?.postal_code || ""}
                               placeholder="Enter postcode"
-                              onChange={(e) => {
-                                const updatedUsers = users.map(u => 
-                                  u.id === user.id ? { ...u, postal_code: e.target.value } : u
-                                );
-                                setUsers(updatedUsers);
-                              }}
-                              onBlur={(e) => handleUpdateProfile(user.id, "postal_code", e.target.value)}
+                              onChange={(e) => setEditedData(prev => prev ? { ...prev, postal_code: e.target.value } : null)}
                               className="max-w-[120px]"
                             />
                           ) : (
@@ -413,42 +418,77 @@ const UsersPage = () => {
                         <TableCell>
                           {new Date(user.created_at).toLocaleDateString()}
                         </TableCell>
-                        {isSuperadmin && (
+                        {(isSuperadmin || isAdmin) && (
                           <TableCell>
                             <div className="flex gap-2">
-                              <Select
-                                value={userRole?.role || "manager"}
-                                onValueChange={(value) =>
-                                  handleRoleChange(user.id, value as "superadmin" | "admin" | "manager")
-                                }
-                              >
-                                <SelectTrigger className="w-[140px]">
-                                  <SelectValue placeholder="Select role" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="superadmin">Superadmin</SelectItem>
-                                  <SelectItem value="admin">Admin</SelectItem>
-                                  <SelectItem value="manager">Manager</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleResetPassword(user.email)}
-                                title="Reset password"
-                              >
-                                <KeyRound className="h-4 w-4 text-blue-500" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  setUserToDelete(user.id);
-                                  setDeleteDialogOpen(true);
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
+                              {isEditing ? (
+                                <>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleSaveEdit(user.id)}
+                                    title="Save changes"
+                                  >
+                                    <Check className="h-4 w-4 text-green-500" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleCancelEdit}
+                                    title="Cancel"
+                                  >
+                                    <X className="h-4 w-4 text-muted-foreground" />
+                                  </Button>
+                                </>
+                              ) : (
+                                <>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleStartEdit(user)}
+                                    title="Edit user"
+                                  >
+                                    <Pencil className="h-4 w-4" />
+                                  </Button>
+                                  {isSuperadmin && (
+                                    <>
+                                      <Select
+                                        value={userRole?.role || "manager"}
+                                        onValueChange={(value) =>
+                                          handleRoleChange(user.id, value as "superadmin" | "admin" | "manager")
+                                        }
+                                      >
+                                        <SelectTrigger className="w-[140px]">
+                                          <SelectValue placeholder="Select role" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="superadmin">Superadmin</SelectItem>
+                                          <SelectItem value="admin">Admin</SelectItem>
+                                          <SelectItem value="manager">Manager</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleResetPassword(user.email)}
+                                        title="Reset password"
+                                      >
+                                        <KeyRound className="h-4 w-4 text-blue-500" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          setUserToDelete(user.id);
+                                          setDeleteDialogOpen(true);
+                                        }}
+                                      >
+                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                      </Button>
+                                    </>
+                                  )}
+                                </>
+                              )}
                             </div>
                           </TableCell>
                         )}

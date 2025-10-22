@@ -89,7 +89,7 @@ const UsersPage = () => {
         .from("user_roles")
         .select("id")
         .eq("user_id", userId)
-        .single();
+        .maybeSingle();
 
       if (existingRole) {
         // Update existing role
@@ -334,18 +334,21 @@ const UsersPage = () => {
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Remove User Role?</AlertDialogTitle>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This will remove the user's role assignment. They will lose access to
-                the dashboard until a new role is assigned.
+                This will permanently remove the user's role assignment. They will lose all access to
+                the dashboard and cannot be restored automatically. Are you sure you want to continue?
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel onClick={() => setUserToDelete(null)}>
                 Cancel
               </AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeleteUser}>
-                Remove Role
+              <AlertDialogAction 
+                onClick={handleDeleteUser}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Yes, Remove Role
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

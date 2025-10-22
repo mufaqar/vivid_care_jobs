@@ -26,7 +26,7 @@ const authSchema = z.object({
     .optional(),
   phone_number: z.string()
     .trim()
-    .regex(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/, "Please enter a valid phone number")
+    .regex(/^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$|^(\+44\s?[1-9]\d{1,4}|\(?0[1-9]\d{1,4}\)?)\s?\d{3,4}\s?\d{3,4}$/, "Please enter a valid UK phone number (e.g., +44 7123 456789 or 020 1234 5678)")
     .max(20, "Phone number must be less than 20 characters")
     .optional(),
   company_name: z.string()
@@ -171,9 +171,18 @@ const Auth = () => {
                   <Input
                     id="phoneNumber"
                     type="tel"
-                    placeholder="+1234567890"
+                    placeholder="+44 7123 456789"
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    onChange={(e) => {
+                      setPhoneNumber(e.target.value);
+                      // Real-time validation
+                      const phoneRegex = /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$|^(\+44\s?[1-9]\d{1,4}|\(?0[1-9]\d{1,4}\)?)\s?\d{3,4}\s?\d{3,4}$/;
+                      if (e.target.value && !phoneRegex.test(e.target.value.trim())) {
+                        e.target.setCustomValidity("Please enter a valid UK phone number");
+                      } else {
+                        e.target.setCustomValidity("");
+                      }
+                    }}
                     required
                   />
                 </div>

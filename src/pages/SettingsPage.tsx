@@ -7,9 +7,48 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Settings, User, Bell, Shield, Database } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 
 const SettingsPage = () => {
   const { user, userRole } = useAuth();
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [leadAssignments, setLeadAssignments] = useState(true);
+  const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
+  const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
+
+  const handleSaveNotifications = () => {
+    toast({
+      title: "Settings saved",
+      description: "Your notification preferences have been updated",
+    });
+    setNotificationDialogOpen(false);
+  };
+
+  const handleSaveAssignments = () => {
+    toast({
+      title: "Settings saved",
+      description: "Your lead assignment preferences have been updated",
+    });
+    setAssignmentDialogOpen(false);
+  };
+
+  const handleOpenBackend = () => {
+    toast({
+      title: "Opening backend",
+      description: "Backend dashboard will open in a new window",
+    });
+    // This would open the backend in production
+    window.open("/", "_blank");
+  };
 
   return (
     <DashboardLayout>
@@ -88,7 +127,13 @@ const SettingsPage = () => {
                     Receive email updates about new leads
                   </p>
                 </div>
-                <Button variant="outline" size="sm">Configure</Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setNotificationDialogOpen(true)}
+                >
+                  Configure
+                </Button>
               </div>
               <Separator />
               <div className="flex items-center justify-between">
@@ -98,7 +143,13 @@ const SettingsPage = () => {
                     Get notified when leads are assigned to you
                   </p>
                 </div>
-                <Button variant="outline" size="sm">Configure</Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAssignmentDialogOpen(true)}
+                >
+                  Configure
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -123,45 +174,73 @@ const SettingsPage = () => {
                       Access backend database and manage data
                     </p>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={handleOpenBackend}>
                     Open Backend
                   </Button>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Security Settings</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Review security policies and access controls
-                    </p>
-                  </div>
-                  <Button variant="outline" size="sm">Configure</Button>
                 </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Danger Zone */}
-          <Card className="border-destructive">
-            <CardHeader>
-              <CardTitle className="text-destructive">Danger Zone</CardTitle>
-              <CardDescription>
-                Irreversible actions - proceed with caution
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+        </div>
+
+        {/* Notification Settings Dialog */}
+        <Dialog open={notificationDialogOpen} onOpenChange={setNotificationDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Email Notification Settings</DialogTitle>
+              <DialogDescription>
+                Configure when you want to receive email notifications
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Delete Account</Label>
+                  <Label>New Lead Notifications</Label>
                   <p className="text-sm text-muted-foreground">
-                    Permanently delete your account and all data
+                    Get notified when new leads are created
                   </p>
                 </div>
-                <Button variant="destructive" size="sm">Delete</Button>
+                <Switch
+                  checked={emailNotifications}
+                  onCheckedChange={setEmailNotifications}
+                />
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+            <div className="flex justify-end">
+              <Button onClick={handleSaveNotifications}>Save Changes</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Lead Assignment Dialog */}
+        <Dialog open={assignmentDialogOpen} onOpenChange={setAssignmentDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Lead Assignment Settings</DialogTitle>
+              <DialogDescription>
+                Configure notifications for lead assignments
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Assignment Notifications</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Get notified when leads are assigned to you
+                  </p>
+                </div>
+                <Switch
+                  checked={leadAssignments}
+                  onCheckedChange={setLeadAssignments}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <Button onClick={handleSaveAssignments}>Save Changes</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );

@@ -19,8 +19,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Shield, ShieldCheck, User } from "lucide-react";
+import { Loader2, Shield, ShieldCheck, User, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface UserWithRole {
   id: string;
@@ -36,6 +47,8 @@ interface UserWithRole {
 const UsersPage = () => {
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
   const { isSuperadmin, isAdmin } = useAuth();
 
   useEffect(() => {
@@ -109,6 +122,60 @@ const UsersPage = () => {
     }
   };
 
+  const handleToggleCrudPrivilege = async (userId: string, currentValue: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("user_roles")
+        .update({ can_manage_crud: !currentValue })
+        .eq("user_id", userId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Privileges updated",
+        description: "User privileges have been successfully updated",
+      });
+      fetchUsers();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error updating privileges",
+        description: "Unable to update user privileges",
+      });
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    try {
+      // First delete the user role
+      const { error: roleError } = await supabase
+        .from("user_roles")
+        .delete()
+        .eq("user_id", userToDelete);
+
+      if (roleError) throw roleError;
+
+      // Note: We can't delete from auth.users directly via client
+      // So we just remove the role assignment
+      toast({
+        title: "User role removed",
+        description: "The user role has been successfully removed",
+      });
+      fetchUsers();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error removing user role",
+        description: "Unable to remove user role",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
+    }
+  };
+
   const getUserRole = (user: UserWithRole) => {
     return user.role && user.role.length > 0 ? user.role[0] : null;
   };
@@ -175,6 +242,7 @@ const UsersPage = () => {
                   <TableHead>User</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
+                  <TableHead>Can Manage CRUD</TableHead>
                   <TableHead>Joined</TableHead>
                   {isSuperadmin && <TableHead>Actions</TableHead>}
                 </TableRow>
@@ -182,7 +250,7 @@ const UsersPage = () => {
               <TableBody>
                 {users.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                       No users found
                     </TableCell>
                   </TableRow>
@@ -204,25 +272,54 @@ const UsersPage = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>
+                          {isSuperadmin ? (
+                            <Checkbox
+                              checked={userRole?.can_manage_crud || false}
+                              onCheckedChange={() =>
+                                handleToggleCrudPrivilege(
+                                  user.id,
+                                  userRole?.can_manage_crud || false
+                                )
+                              }
+                            />
+                          ) : (
+                            <Badge variant={userRole?.can_manage_crud ? "default" : "outline"}>
+                              {userRole?.can_manage_crud ? "Yes" : "No"}
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
                           {new Date(user.created_at).toLocaleDateString()}
                         </TableCell>
                         {isSuperadmin && (
                           <TableCell>
-                            <Select
-                              defaultValue={userRole?.role || "manager"}
-                              onValueChange={(value) =>
-                                handleRoleChange(user.id, value as "superadmin" | "admin" | "manager")
-                              }
-                            >
-                              <SelectTrigger className="w-[140px]">
-                                <SelectValue placeholder="Select role" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="superadmin">Superadmin</SelectItem>
-                                <SelectItem value="admin">Admin</SelectItem>
-                                <SelectItem value="manager">Manager</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <div className="flex gap-2">
+                              <Select
+                                value={userRole?.role || "manager"}
+                                onValueChange={(value) =>
+                                  handleRoleChange(user.id, value as "superadmin" | "admin" | "manager")
+                                }
+                              >
+                                <SelectTrigger className="w-[140px]">
+                                  <SelectValue placeholder="Select role" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="superadmin">Superadmin</SelectItem>
+                                  <SelectItem value="admin">Admin</SelectItem>
+                                  <SelectItem value="manager">Manager</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setUserToDelete(user.id);
+                                  setDeleteDialogOpen(true);
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </div>
                           </TableCell>
                         )}
                       </TableRow>
@@ -233,6 +330,26 @@ const UsersPage = () => {
             </Table>
           </div>
         )}
+
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove User Role?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will remove the user's role assignment. They will lose access to
+                the dashboard until a new role is assigned.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setUserToDelete(null)}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteUser}>
+                Remove Role
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </DashboardLayout>
   );

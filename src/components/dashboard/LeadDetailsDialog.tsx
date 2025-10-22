@@ -135,6 +135,7 @@ export const LeadDetailsDialog = ({
       });
       setNewNote("");
       fetchNotes();
+      onUpdate(); // Refresh the main table to show note count
     }
   };
 
@@ -155,6 +156,7 @@ export const LeadDetailsDialog = ({
         });
       } else {
         fetchTags();
+        onUpdate(); // Refresh the main table to show tags
       }
     } else {
       const { error } = await supabase.from("lead_tags").insert([{
@@ -170,6 +172,7 @@ export const LeadDetailsDialog = ({
         });
       } else {
         fetchTags();
+        onUpdate(); // Refresh the main table to show tags
       }
     }
   };

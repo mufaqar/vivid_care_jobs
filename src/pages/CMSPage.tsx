@@ -71,11 +71,20 @@ const CMSPage = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
+    // Build options object from individual fields
+    const optionsArray = formData.getAll("option_value");
+    const options: Record<string, string> = {};
+    optionsArray.forEach((value, index) => {
+      if (value) {
+        options[`option${index + 1}`] = value as string;
+      }
+    });
+
     const questionData = {
       step_number: parseInt(formData.get("step_number") as string),
       field_name: formData.get("field_name") as string,
       question_text: formData.get("question_text") as string,
-      options: JSON.parse(formData.get("options") as string || "{}"),
+      options: options,
       is_active: formData.get("is_active") === "true",
     };
 
@@ -292,15 +301,24 @@ const CMSPage = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="options">Options (JSON)</Label>
-              <Textarea
-                id="options"
-                name="options"
-                defaultValue={JSON.stringify(editingQuestion?.options || {}, null, 2)}
-                rows={6}
-                placeholder='{"option1": "Label 1", "option2": "Label 2"}'
-                required
-              />
+              <Label>Options</Label>
+              <p className="text-sm text-muted-foreground mb-2">
+                Add multiple choice options for this question
+              </p>
+              {[1, 2, 3, 4, 5].map((num) => {
+                const optionKey = `option${num}`;
+                const defaultValue = editingQuestion?.options?.[optionKey] || "";
+                return (
+                  <div key={num} className="flex items-center gap-2">
+                    <Label className="w-20">Option {num}</Label>
+                    <Input
+                      name="option_value"
+                      placeholder={`Option ${num} text (leave empty if not needed)`}
+                      defaultValue={defaultValue}
+                    />
+                  </div>
+                );
+              })}
             </div>
             <div className="flex items-center space-x-2">
               <input

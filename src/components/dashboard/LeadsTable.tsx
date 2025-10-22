@@ -12,10 +12,20 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { LeadFilters } from "@/pages/LeadsPage";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Trash2, MessageSquare, Flame, AlertCircle, Phone, Tag as TagIcon } from "lucide-react";
 import { LeadDetailsDialog } from "./LeadDetailsDialog";
 import { format } from "date-fns";
 import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Lead {
   id: string;
@@ -32,6 +42,8 @@ interface Lead {
   manager?: {
     full_name: string | null;
   } | null;
+  lead_tags?: Array<{ tag: string }>;
+  lead_notes?: Array<{ id: string }>;
 }
 
 interface LeadsTableProps {
@@ -42,7 +54,9 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const { isSuperadmin, isAdmin } = useAuth();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [leadToDelete, setLeadToDelete] = useState<string | null>(null);
+  const { isSuperadmin, isAdmin, canManageCrud } = useAuth();
 
   useEffect(() => {
     fetchLeads();
@@ -77,7 +91,9 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
           *,
           manager:profiles!leads_assigned_manager_id_fkey (
             full_name
-          )
+          ),
+          lead_tags (tag),
+          lead_notes (id)
         `)
         .order("created_at", { ascending: false });
 
@@ -116,6 +132,34 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
     }
   };
 
+  const handleDeleteLead = async () => {
+    if (!leadToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from("leads")
+        .delete()
+        .eq("id", leadToDelete);
+
+      if (error) throw error;
+
+      toast({
+        title: "Lead deleted",
+        description: "The lead has been successfully deleted",
+      });
+      fetchLeads();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error deleting lead",
+        description: "Unable to delete the lead",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setLeadToDelete(null);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       new: "bg-blue-500",
@@ -126,6 +170,15 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
     };
     return colors[status] || "bg-gray-500";
   };
+
+  const tagIcons: Record<string, any> = {
+    hot: Flame,
+    spam: AlertCircle,
+    called: Phone,
+    urgent: TagIcon,
+  };
+
+  const canDelete = isSuperadmin || (isAdmin && canManageCrud);
 
   if (loading) {
     return (
@@ -145,6 +198,8 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Tags</TableHead>
+              <TableHead>Notes</TableHead>
               <TableHead>Manager</TableHead>
               <TableHead>Created</TableHead>
               <TableHead>Actions</TableHead>
@@ -153,38 +208,74 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
           <TableBody>
             {leads.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                   No leads found. Start collecting leads through your website!
                 </TableCell>
               </TableRow>
             ) : (
-              leads.map((lead) => (
-                <TableRow key={lead.id}>
-                  <TableCell className="font-medium">{lead.contact_name}</TableCell>
-                  <TableCell>{lead.contact_email}</TableCell>
-                  <TableCell>{lead.contact_phone}</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(lead.status)}>
-                      {lead.status.replace("_", " ")}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {lead.manager?.full_name || "Unassigned"}
-                  </TableCell>
-                  <TableCell>
-                    {format(new Date(lead.created_at), "MMM dd, yyyy")}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setSelectedLead(lead)}
-                    >
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
+              leads.map((lead) => {
+                const tags = lead.lead_tags || [];
+                const notesCount = lead.lead_notes?.length || 0;
+                return (
+                  <TableRow key={lead.id}>
+                    <TableCell className="font-medium">{lead.contact_name}</TableCell>
+                    <TableCell>{lead.contact_email}</TableCell>
+                    <TableCell>{lead.contact_phone}</TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(lead.status)}>
+                        {lead.status.replace("_", " ")}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        {tags.map((tagObj, idx) => {
+                          const Icon = tagIcons[tagObj.tag];
+                          return Icon ? (
+                            <Icon key={idx} className="h-4 w-4" />
+                          ) : null;
+                        })}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {notesCount > 0 && (
+                        <div className="flex items-center gap-1">
+                          <MessageSquare className="h-4 w-4" />
+                          <span className="text-sm">{notesCount}</span>
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {lead.manager?.full_name || "Unassigned"}
+                    </TableCell>
+                    <TableCell>
+                      {format(new Date(lead.created_at), "MMM dd, yyyy")}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedLead(lead)}
+                        >
+                          View
+                        </Button>
+                        {canDelete && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setLeadToDelete(lead.id);
+                              setDeleteDialogOpen(true);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
@@ -198,6 +289,26 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
           onUpdate={fetchLeads}
         />
       )}
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the lead
+              and all associated notes and tags.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setLeadToDelete(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteLead}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Loader2, Shield, ShieldCheck, User, Trash2 } from "lucide-react";
+import { Loader2, Shield, ShieldCheck, User, Trash2, KeyRound } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -180,6 +180,27 @@ const UsersPage = () => {
     } finally {
       setDeleteDialogOpen(false);
       setUserToDelete(null);
+    }
+  };
+
+  const handleResetPassword = async (userEmail: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(userEmail, {
+        redirectTo: `${window.location.origin}/auth?reset=true`,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Password reset email sent",
+        description: `A password reset link has been sent to ${userEmail}`,
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error sending reset email",
+        description: "Unable to send password reset email",
+      });
     }
   };
 
@@ -410,6 +431,14 @@ const UsersPage = () => {
                                   <SelectItem value="manager">Manager</SelectItem>
                                 </SelectContent>
                               </Select>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleResetPassword(user.email)}
+                                title="Reset password"
+                              >
+                                <KeyRound className="h-4 w-4 text-blue-500" />
+                              </Button>
                               <Button
                                 variant="ghost"
                                 size="sm"

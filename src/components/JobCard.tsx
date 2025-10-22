@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { MapPin, Clock, Briefcase } from "lucide-react";
+import { MapPin, Clock } from "lucide-react";
+import justLogo from "@/assets/just-logo-2.png";
 
 interface JobCardProps {
   title: string;
@@ -12,8 +13,8 @@ const JobCard = ({ title, location, type, salary }: JobCardProps) => {
   return (
     <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-lg transition-all hover:-translate-y-1 duration-300">
       <div className="flex items-start justify-between mb-4">
-        <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
-          <Briefcase className="w-6 h-6 text-accent" />
+        <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center p-2">
+          <img src={justLogo} alt="Just Healthcare" className="w-full h-full object-contain" />
         </div>
         <span className="px-3 py-1 bg-success/10 text-success text-xs font-medium rounded-full">
           Active

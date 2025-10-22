@@ -1,14 +1,13 @@
 import { Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import careLogo from "@/assets/care-logo.png";
 
 const Header = () => {
   return (
     <header className="bg-card border-b border-border sticky top-0 z-50 backdrop-blur-sm bg-card/95">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FCEAF3' }}>
-            <img src={careLogo} alt="Vivid Care Logo" className="w-6 h-6 object-contain" />
+          <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
+            <span className="text-accent-foreground font-bold text-xl">V</span>
           </div>
           <span className="text-xl font-bold text-foreground">Vivid Care</span>
         </div>

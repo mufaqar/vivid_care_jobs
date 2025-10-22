@@ -1,14 +1,29 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, UserCheck, Phone, Flame } from "lucide-react";
 import { Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Stats {
+  totalLeads: number;
+  newLeads: number;
+  hotLeads: number;
+  calledLeads: number;
+}
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [stats, setStats] = useState<Stats>({
+    totalLeads: 0,
+    newLeads: 0,
+    hotLeads: 0,
+    calledLeads: 0,
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -16,7 +31,61 @@ const Dashboard = () => {
     }
   }, [user, loading, navigate]);
 
-  if (loading) {
+  useEffect(() => {
+    if (user) {
+      fetchStats();
+    }
+  }, [user]);
+
+  const fetchStats = async () => {
+    setStatsLoading(true);
+    try {
+      // Get total leads
+      const { count: totalCount } = await supabase
+        .from("leads")
+        .select("*", { count: "exact", head: true });
+
+      // Get new leads (created this month)
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+      
+      const { count: newCount } = await supabase
+        .from("leads")
+        .select("*", { count: "exact", head: true })
+        .gte("created_at", startOfMonth.toISOString());
+
+      // Get hot leads
+      const { count: hotCount } = await supabase
+        .from("lead_tags")
+        .select("*", { count: "exact", head: true })
+        .eq("tag", "hot");
+
+      // Get called leads (this week)
+      const startOfWeek = new Date();
+      startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+      startOfWeek.setHours(0, 0, 0, 0);
+      
+      const { count: calledCount } = await supabase
+        .from("lead_tags")
+        .select("*", { count: "exact", head: true })
+        .eq("tag", "called")
+        .gte("created_at", startOfWeek.toISOString());
+
+      setStats({
+        totalLeads: totalCount || 0,
+        newLeads: newCount || 0,
+        hotLeads: hotCount || 0,
+        calledLeads: calledCount || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  if (loading || statsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -45,7 +114,7 @@ const Dashboard = () => {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{stats.totalLeads}</div>
               <p className="text-xs text-muted-foreground">All time</p>
             </CardContent>
           </Card>
@@ -56,7 +125,7 @@ const Dashboard = () => {
               <UserCheck className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{stats.newLeads}</div>
               <p className="text-xs text-muted-foreground">This month</p>
             </CardContent>
           </Card>
@@ -67,7 +136,7 @@ const Dashboard = () => {
               <Flame className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{stats.hotLeads}</div>
               <p className="text-xs text-muted-foreground">Requires attention</p>
             </CardContent>
           </Card>
@@ -78,7 +147,7 @@ const Dashboard = () => {
               <Phone className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{stats.calledLeads}</div>
               <p className="text-xs text-muted-foreground">This week</p>
             </CardContent>
           </Card>

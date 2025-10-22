@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { X, Check, Mail, Phone, User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LeadOnboardingDialogProps {
   open: boolean;
@@ -32,7 +33,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
     if (step > 1) setStep(step - 1);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validate form
     if (!formData.contactName || !formData.email || !formData.phone) {
       toast({
@@ -43,8 +44,33 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
       return;
     }
     
-    // Show success screen
-    setStep(7);
+    try {
+      // Get current user (if logged in) or submit as anonymous
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const { error } = await supabase.from("leads").insert({
+        support_type: formData.supportType,
+        visit_frequency: formData.visitFrequency,
+        care_duration: formData.careDuration,
+        priority: formData.priority,
+        contact_name: formData.contactName,
+        contact_email: formData.email,
+        contact_phone: formData.phone,
+        created_by: user?.id || null,
+      });
+
+      if (error) throw error;
+
+      // Show success screen
+      setStep(7);
+    } catch (error) {
+      console.error("Error submitting lead:", error);
+      toast({
+        title: "Error",
+        description: "There was an error submitting your information. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleClose = () => {

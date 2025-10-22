@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Loader2, Shield, ShieldCheck, User, Trash2, KeyRound, Pencil, Check, X } from "lucide-react";
+import { Loader2, Shield, ShieldCheck, User, Trash2, KeyRound, Pencil, Check, X, Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -33,6 +33,26 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface UserWithRole {
   id: string;
@@ -60,7 +80,34 @@ const UsersPage = () => {
     company_name: string;
     postal_code: string;
   } | null>(null);
+  const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
   const { isSuperadmin, isAdmin } = useAuth();
+
+  const newUserSchema = z.object({
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    full_name: z.string().min(1, "Name is required"),
+    phone_number: z.string().optional(),
+    company_name: z.string().optional(),
+    postal_code: z.string().optional(),
+    role: z.enum(["superadmin", "admin", "manager"]),
+  });
+
+  type NewUserFormData = z.infer<typeof newUserSchema>;
+
+  const form = useForm<NewUserFormData>({
+    resolver: zodResolver(newUserSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      full_name: "",
+      phone_number: "",
+      company_name: "",
+      postal_code: "",
+      role: "manager",
+    },
+  });
 
   useEffect(() => {
     fetchUsers();
@@ -254,6 +301,56 @@ const UsersPage = () => {
     }
   };
 
+  const handleCreateUser = async (data: NewUserFormData) => {
+    setIsCreatingUser(true);
+    try {
+      // Create the user via Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            full_name: data.full_name,
+            phone_number: data.phone_number,
+            company_name: data.company_name,
+            postal_code: data.postal_code,
+          },
+          emailRedirectTo: `${window.location.origin}/auth`,
+        },
+      });
+
+      if (authError) throw authError;
+      if (!authData.user) throw new Error("User creation failed");
+
+      // Assign role to the new user
+      const { error: roleError } = await supabase
+        .from("user_roles")
+        .insert({
+          user_id: authData.user.id,
+          role: data.role,
+        });
+
+      if (roleError) throw roleError;
+
+      toast({
+        title: "User created successfully",
+        description: `User ${data.email} has been created with ${data.role} role`,
+      });
+
+      setAddUserDialogOpen(false);
+      form.reset();
+      fetchUsers();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error creating user",
+        description: error.message || "Unable to create user",
+      });
+    } finally {
+      setIsCreatingUser(false);
+    }
+  };
+
   const getUserRole = (user: UserWithRole) => {
     return user.role && user.role.length > 0 ? user.role[0] : null;
   };
@@ -301,11 +398,19 @@ const UsersPage = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">User Management</h1>
-          <p className="text-muted-foreground">
-            Manage user roles and permissions
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">User Management</h1>
+            <p className="text-muted-foreground">
+              Manage user roles and permissions
+            </p>
+          </div>
+          {isSuperadmin && (
+            <Button onClick={() => setAddUserDialogOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add New User
+            </Button>
+          )}
         </div>
 
         {loading ? (
@@ -523,6 +628,145 @@ const UsersPage = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        <Dialog open={addUserDialogOpen} onOpenChange={setAddUserDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Add New User</DialogTitle>
+              <DialogDescription>
+                Create a new user account with the specified role and permissions.
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleCreateUser)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="user@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="full_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John Doe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone_number"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="+44 123 456 7890" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="company_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Company Name (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Company Ltd" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="postal_code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Postal Code (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="SW1A 1AA" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Role</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a role" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="superadmin">Superadmin</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="manager">Manager</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setAddUserDialogOpen(false);
+                      form.reset();
+                    }}
+                    disabled={isCreatingUser}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isCreatingUser}>
+                    {isCreatingUser && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Create User
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );

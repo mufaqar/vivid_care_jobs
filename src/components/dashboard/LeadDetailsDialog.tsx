@@ -26,6 +26,7 @@ interface Lead {
   contact_name: string;
   contact_email: string;
   contact_phone: string;
+  postal_code: string | null;
   support_type: string | null;
   visit_frequency: string | null;
   care_duration: string | null;
@@ -250,6 +251,12 @@ export const LeadDetailsDialog = ({
                 <Label className="text-muted-foreground">Phone</Label>
                 <p className="font-medium">{lead.contact_phone}</p>
               </div>
+              {lead.postal_code && (
+                <div>
+                  <Label className="text-muted-foreground">Postcode</Label>
+                  <p className="font-medium">{lead.postal_code}</p>
+                </div>
+              )}
             </div>
           </div>
 

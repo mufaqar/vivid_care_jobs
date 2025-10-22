@@ -92,6 +92,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          postal_code: string | null
           priority: string | null
           status: Database["public"]["Enums"]["lead_status"]
           support_type: string | null
@@ -107,6 +108,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          postal_code?: string | null
           priority?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
           support_type?: string | null
@@ -122,6 +124,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          postal_code?: string | null
           priority?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
           support_type?: string | null

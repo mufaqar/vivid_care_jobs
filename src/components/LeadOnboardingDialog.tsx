@@ -37,13 +37,14 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
     visitFrequency: "twice-daily",
     careDuration: "long-term",
     priority: "flexibility",
+    postalCode: "",
     contactName: "",
     email: "",
     phone: "",
   });
 
   const handleNext = () => {
-    if (step < 7) setStep(step + 1);
+    if (step < 8) setStep(step + 1);
   };
 
   const handleBack = () => {
@@ -76,6 +77,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
         visit_frequency: formData.visitFrequency,
         care_duration: formData.careDuration,
         priority: formData.priority,
+        postal_code: formData.postalCode,
         contact_name: result.data.contactName,
         contact_email: result.data.email,
         contact_phone: result.data.phone,
@@ -85,7 +87,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
       if (error) throw error;
 
       // Show success screen
-      setStep(7);
+      setStep(8);
     } catch (error) {
       toast({
         title: "Error",
@@ -102,6 +104,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
       visitFrequency: "twice-daily",
       careDuration: "long-term",
       priority: "flexibility",
+      postalCode: "",
       contactName: "",
       email: "",
       phone: "",
@@ -110,7 +113,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
   };
 
   const renderProgressIndicator = () => {
-    const steps = [1, 2, 3, 4];
+    const steps = [1, 2, 3, 4, 5];
     return (
       <div className="flex items-center justify-center gap-4 mb-8">
         {steps.map((s) => (
@@ -124,7 +127,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
             >
               {s < 10 ? `0${s}` : s}
             </div>
-            {s < 4 && (
+            {s < 5 && (
               <div className={`w-20 h-0.5 border-t-2 border-dashed ${
                 step > s ? "border-[#3DD9E8]" : "border-gray-300"
               }`} />
@@ -149,7 +152,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
           <span className="sr-only">Close</span>
         </DialogClose>
 
-        {step <= 4 && renderProgressIndicator()}
+        {step <= 5 && renderProgressIndicator()}
 
         {/* Step 1: Support Type */}
         {step === 1 && (
@@ -400,8 +403,41 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
           </div>
         )}
 
-        {/* Step 5: Success Message */}
+        {/* Step 5: Postal Code */}
         {step === 5 && (
+          <div className="space-y-8">
+            <h2 className="text-3xl font-bold text-center text-[#0B1D41]">
+              Good! We're almost there.<br />Tell us the Postcode to attach to this
+            </h2>
+            <div className="space-y-4">
+              <Input
+                type="text"
+                placeholder="Enter Postcode"
+                value={formData.postalCode}
+                onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                className="py-6 text-base text-center"
+              />
+            </div>
+            <div className="flex gap-4 pt-4">
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                className="flex-1 py-6 text-base"
+              >
+                Back
+              </Button>
+              <Button
+                onClick={handleNext}
+                className="flex-1 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
+              >
+                Continue
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 6: Success Message */}
+        {step === 6 && (
           <div className="space-y-8 py-8 text-center">
             <div className="flex justify-center">
               <div className="w-24 h-24 rounded-full bg-[#3DD9E8] flex items-center justify-center">
@@ -434,8 +470,8 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
           </div>
         )}
 
-        {/* Step 6: Contact Form */}
-        {step === 6 && (
+        {/* Step 7: Contact Form */}
+        {step === 7 && (
           <div className="space-y-8">
             <div className="text-center">
               <h2 className="text-3xl font-bold text-[#0B1D41] mb-4">
@@ -487,8 +523,8 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
           </div>
         )}
 
-        {/* Step 7: Final Success */}
-        {step === 7 && (
+        {/* Step 8: Final Success */}
+        {step === 8 && (
           <div className="space-y-8 py-8 text-center">
             <div className="flex justify-center">
               <div className="relative">

@@ -32,6 +32,7 @@ interface Lead {
   contact_name: string;
   contact_email: string;
   contact_phone: string;
+  postal_code: string | null;
   support_type: string | null;
   visit_frequency: string | null;
   care_duration: string | null;
@@ -204,6 +205,7 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
+              <TableHead>Postcode</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Tags</TableHead>
               <TableHead>Notes</TableHead>
@@ -215,7 +217,7 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
           <TableBody>
             {leads.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                   No leads found. Start collecting leads through your website!
                 </TableCell>
               </TableRow>
@@ -228,6 +230,7 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
                     <TableCell className="font-medium">{lead.contact_name}</TableCell>
                     <TableCell>{lead.contact_email}</TableCell>
                     <TableCell>{lead.contact_phone}</TableCell>
+                    <TableCell>{lead.postal_code || "-"}</TableCell>
                     <TableCell>
                       <Badge className={getStatusColor(lead.status)}>
                         {lead.status.replace("_", " ")}

@@ -62,7 +62,8 @@ const Auth = () => {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
+      // Only redirect on sign in events, not on initial load or sign out
+      if (event === 'SIGNED_IN' && session) {
         navigate("/dashboard");
       }
     });

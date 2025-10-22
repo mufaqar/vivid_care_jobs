@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Loader2, Shield, ShieldCheck, User, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -37,6 +38,7 @@ interface UserWithRole {
   id: string;
   email: string;
   full_name: string | null;
+  phone_number: string | null;
   created_at: string;
   role?: {
     role: "superadmin" | "admin" | "manager";
@@ -64,6 +66,7 @@ const UsersPage = () => {
           id,
           email,
           full_name,
+          phone_number,
           created_at,
           role:user_roles(role, can_manage_crud)
         `)
@@ -176,6 +179,28 @@ const UsersPage = () => {
     }
   };
 
+  const handleUpdateProfile = async (userId: string, field: "full_name" | "phone_number", value: string) => {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ [field]: value })
+        .eq("id", userId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Profile updated",
+        description: "User profile has been successfully updated",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error updating profile",
+        description: "Unable to update user profile",
+      });
+    }
+  };
+
   const getUserRole = (user: UserWithRole) => {
     return user.role && user.role.length > 0 ? user.role[0] : null;
   };
@@ -239,8 +264,9 @@ const UsersPage = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>User</TableHead>
+                  <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
+                  <TableHead>Phone</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Can Manage CRUD</TableHead>
                   <TableHead>Joined</TableHead>
@@ -260,12 +286,45 @@ const UsersPage = () => {
                     return (
                       <TableRow key={user.id}>
                         <TableCell className="font-medium">
-                          <div className="flex items-center gap-2">
-                            {getRoleIcon(userRole?.role)}
-                            {user.full_name || "Unnamed User"}
-                          </div>
+                          {(isSuperadmin || isAdmin) ? (
+                            <Input
+                              value={user.full_name || ""}
+                              placeholder="Enter name"
+                              onChange={(e) => {
+                                const updatedUsers = users.map(u => 
+                                  u.id === user.id ? { ...u, full_name: e.target.value } : u
+                                );
+                                setUsers(updatedUsers);
+                              }}
+                              onBlur={(e) => handleUpdateProfile(user.id, "full_name", e.target.value)}
+                              className="max-w-[200px]"
+                            />
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              {getRoleIcon(userRole?.role)}
+                              {user.full_name || "Unnamed User"}
+                            </div>
+                          )}
                         </TableCell>
                         <TableCell>{user.email}</TableCell>
+                        <TableCell>
+                          {(isSuperadmin || isAdmin) ? (
+                            <Input
+                              value={user.phone_number || ""}
+                              placeholder="Enter phone"
+                              onChange={(e) => {
+                                const updatedUsers = users.map(u => 
+                                  u.id === user.id ? { ...u, phone_number: e.target.value } : u
+                                );
+                                setUsers(updatedUsers);
+                              }}
+                              onBlur={(e) => handleUpdateProfile(user.id, "phone_number", e.target.value)}
+                              className="max-w-[150px]"
+                            />
+                          ) : (
+                            user.phone_number || "—"
+                          )}
+                        </TableCell>
                         <TableCell>
                           <Badge className={getRoleBadgeColor(userRole?.role)}>
                             {userRole?.role || "No Role"}

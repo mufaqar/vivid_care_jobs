@@ -115,11 +115,11 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
   const renderProgressIndicator = () => {
     const steps = [1, 2, 3, 4, 5];
     return (
-      <div className="flex items-center justify-center gap-4 mb-8">
+      <div className="flex items-center justify-center gap-2 sm:gap-4 mb-6 sm:mb-8">
         {steps.map((s) => (
           <div key={s} className="flex items-center">
             <div
-              className={`flex items-center justify-center w-14 h-14 rounded-full font-semibold text-lg ${
+              className={`flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-full font-semibold text-sm sm:text-lg ${
                 step >= s
                   ? "bg-[#3DD9E8] text-white"
                   : "bg-gray-200 text-gray-400"
@@ -128,7 +128,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
               {s < 10 ? `0${s}` : s}
             </div>
             {s < 5 && (
-              <div className={`w-20 h-0.5 border-t-2 border-dashed ${
+              <div className={`w-8 sm:w-20 h-0.5 border-t-2 border-dashed ${
                 step > s ? "border-[#3DD9E8]" : "border-gray-300"
               }`} />
             )}
@@ -140,15 +140,15 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-8" aria-describedby="lead-dialog-description">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 md:p-8" aria-describedby="lead-dialog-description">
         <div className="sr-only" id="lead-dialog-description">
           Complete this form to get matched with the best home care services for your needs
         </div>
         <DialogClose 
-          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100"
+          className="absolute right-2 top-2 sm:right-4 sm:top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100"
           onClick={handleClose}
         >
-          <X className="h-6 w-6 text-gray-400" />
+          <X className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400" />
           <span className="sr-only">Close</span>
         </DialogClose>
 
@@ -156,60 +156,60 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
         {/* Step 1: Support Type */}
         {step === 1 && (
-          <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-center text-[#0B1D41]">
-              What type of support do you need<br />from a live-in carer?
+          <div className="space-y-6 sm:space-y-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-[#0B1D41] leading-tight">
+              What type of support do you need<br className="hidden sm:block" /><span className="sm:hidden"> </span>from a live-in carer?
             </h2>
             <RadioGroup
               value={formData.supportType}
               onValueChange={(value) => setFormData({ ...formData, supportType: value })}
               className="space-y-3"
             >
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.supportType === "mobility" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="mobility" id="mobility" />
-                <Label htmlFor="mobility" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="mobility" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Mobility and physical support
                 </Label>
               </div>
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.supportType === "companionship" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="companionship" id="companionship" />
-                <Label htmlFor="companionship" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="companionship" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Companionship and social support
                 </Label>
               </div>
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.supportType === "meal" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="meal" id="meal" />
-                <Label htmlFor="meal" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="meal" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Meal preparation and household tasks
                 </Label>
               </div>
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.supportType === "medication" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="medication" id="medication" />
-                <Label htmlFor="medication" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="medication" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Medication reminders and health monitoring
                 </Label>
               </div>
             </RadioGroup>
-            <div className="flex gap-4 pt-4 justify-center">
+            <div className="flex gap-3 sm:gap-4 pt-4 justify-center">
               <Button
                 variant="outline"
                 onClick={handleBack}
-                className="w-32 py-6 text-base"
+                className="w-24 sm:w-32 py-4 sm:py-6 text-sm sm:text-base"
                 disabled={step === 1}
               >
                 Back
               </Button>
               <Button
                 onClick={handleNext}
-                className="w-32 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
+                className="w-24 sm:w-32 py-4 sm:py-6 text-sm sm:text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
               >
                 Continue
               </Button>
@@ -219,59 +219,59 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
         {/* Step 2: Visit Frequency */}
         {step === 2 && (
-          <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-center text-[#0B1D41]">
-              How often would you like a home<br />carer to visit?
+          <div className="space-y-6 sm:space-y-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-[#0B1D41] leading-tight">
+              How often would you like a home<br className="hidden sm:block" /><span className="sm:hidden"> </span>carer to visit?
             </h2>
             <RadioGroup
               value={formData.visitFrequency}
               onValueChange={(value) => setFormData({ ...formData, visitFrequency: value })}
               className="space-y-3"
             >
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.visitFrequency === "once-daily" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="once-daily" id="once-daily" />
-                <Label htmlFor="once-daily" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="once-daily" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Once a day
                 </Label>
               </div>
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.visitFrequency === "twice-daily" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="twice-daily" id="twice-daily" />
-                <Label htmlFor="twice-daily" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="twice-daily" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Twice a day
                 </Label>
               </div>
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.visitFrequency === "overnight" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="overnight" id="overnight" />
-                <Label htmlFor="overnight" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="overnight" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Overnight stays
                 </Label>
               </div>
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.visitFrequency === "few-times" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="few-times" id="few-times" />
-                <Label htmlFor="few-times" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="few-times" className="flex-1 cursor-pointer text-sm sm:text-base">
                   A few times a week
                 </Label>
               </div>
             </RadioGroup>
-            <div className="flex gap-4 pt-4 justify-center">
+            <div className="flex gap-3 sm:gap-4 pt-4 justify-center">
               <Button
                 variant="outline"
                 onClick={handleBack}
-                className="w-32 py-6 text-base"
+                className="w-24 sm:w-32 py-4 sm:py-6 text-sm sm:text-base"
               >
                 Back
               </Button>
               <Button
                 onClick={handleNext}
-                className="w-32 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
+                className="w-24 sm:w-32 py-4 sm:py-6 text-sm sm:text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
               >
                 Continue
               </Button>
@@ -281,59 +281,59 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
         {/* Step 3: Care Duration */}
         {step === 3 && (
-          <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-center text-[#0B1D41]">
-              How long do you require<br />live-in care?
+          <div className="space-y-6 sm:space-y-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-[#0B1D41] leading-tight">
+              How long do you require<br className="hidden sm:block" /><span className="sm:hidden"> </span>live-in care?
             </h2>
             <RadioGroup
               value={formData.careDuration}
               onValueChange={(value) => setFormData({ ...formData, careDuration: value })}
               className="space-y-3"
             >
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.careDuration === "short-term" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="short-term" id="short-term" />
-                <Label htmlFor="short-term" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="short-term" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Short-term (respite or recovery care)
                 </Label>
               </div>
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.careDuration === "long-term" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="long-term" id="long-term" />
-                <Label htmlFor="long-term" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="long-term" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Long-term continuous support
                 </Label>
               </div>
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.careDuration === "emergency" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="emergency" id="emergency" />
-                <Label htmlFor="emergency" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="emergency" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Emergency / Immediate start
                 </Label>
               </div>
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.careDuration === "unsure" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="unsure" id="unsure" />
-                <Label htmlFor="unsure" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="unsure" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Not sure yet, need advice
                 </Label>
               </div>
             </RadioGroup>
-            <div className="flex gap-4 pt-4 justify-center">
+            <div className="flex gap-3 sm:gap-4 pt-4 justify-center">
               <Button
                 variant="outline"
                 onClick={handleBack}
-                className="w-32 py-6 text-base"
+                className="w-24 sm:w-32 py-4 sm:py-6 text-sm sm:text-base"
               >
                 Back
               </Button>
               <Button
                 onClick={handleNext}
-                className="w-32 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
+                className="w-24 sm:w-32 py-4 sm:py-6 text-sm sm:text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
               >
                 Continue
               </Button>
@@ -343,59 +343,59 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
         {/* Step 4: Priority */}
         {step === 4 && (
-          <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-center text-[#0B1D41]">
-              What is most important to you in<br />choosing a home care service?
+          <div className="space-y-6 sm:space-y-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-[#0B1D41] leading-tight">
+              What is most important to you in<br className="hidden sm:block" /><span className="sm:hidden"> </span>choosing a home care service?
             </h2>
             <RadioGroup
               value={formData.priority}
               onValueChange={(value) => setFormData({ ...formData, priority: value })}
               className="space-y-3"
             >
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.priority === "compassion" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="compassion" id="compassion" />
-                <Label htmlFor="compassion" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="compassion" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Compassionate and friendly carers
                 </Label>
               </div>
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.priority === "flexibility" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="flexibility" id="flexibility" />
-                <Label htmlFor="flexibility" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="flexibility" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Flexible scheduling and reliability
                 </Label>
               </div>
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.priority === "expertise" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="expertise" id="expertise" />
-                <Label htmlFor="expertise" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="expertise" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Specialist expertise
                 </Label>
               </div>
-              <div className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer ${
+              <div className={`flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 formData.priority === "affordability" ? "bg-[#E0F7FA] border-[#3DD9E8]" : "border-gray-200"
               }`}>
                 <RadioGroupItem value="affordability" id="affordability" />
-                <Label htmlFor="affordability" className="flex-1 cursor-pointer text-base">
+                <Label htmlFor="affordability" className="flex-1 cursor-pointer text-sm sm:text-base">
                   Affordability and clear pricing
                 </Label>
               </div>
             </RadioGroup>
-            <div className="flex gap-4 pt-4 justify-center">
+            <div className="flex gap-3 sm:gap-4 pt-4 justify-center">
               <Button
                 variant="outline"
                 onClick={handleBack}
-                className="w-32 py-6 text-base"
+                className="w-24 sm:w-32 py-4 sm:py-6 text-sm sm:text-base"
               >
                 Back
               </Button>
               <Button
                 onClick={handleNext}
-                className="w-32 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
+                className="w-24 sm:w-32 py-4 sm:py-6 text-sm sm:text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
               >
                 Continue
               </Button>
@@ -405,9 +405,9 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
         {/* Step 5: Postal Code */}
         {step === 5 && (
-          <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-center text-[#0B1D41]">
-              Good! We're almost there.<br />Tell us the Postcode to attach to this
+          <div className="space-y-6 sm:space-y-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-[#0B1D41] leading-tight">
+              Good! We're almost there.<br className="hidden sm:block" /><span className="sm:hidden"> </span>Tell us the Postcode to attach to this
             </h2>
             <div className="space-y-4 flex justify-center">
               <Input
@@ -415,20 +415,20 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 placeholder="Enter Postcode"
                 value={formData.postalCode}
                 onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                className="py-6 text-base text-center w-[70%]"
+                className="py-4 sm:py-6 text-sm sm:text-base text-center w-full sm:w-[70%]"
               />
             </div>
-            <div className="flex gap-4 pt-4 justify-center">
+            <div className="flex gap-3 sm:gap-4 pt-4 justify-center">
               <Button
                 variant="outline"
                 onClick={handleBack}
-                className="w-32 py-6 text-base"
+                className="w-24 sm:w-32 py-4 sm:py-6 text-sm sm:text-base"
               >
                 Back
               </Button>
               <Button
                 onClick={handleNext}
-                className="w-32 py-6 text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
+                className="w-24 sm:w-32 py-4 sm:py-6 text-sm sm:text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
               >
                 Continue
               </Button>

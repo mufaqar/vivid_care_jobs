@@ -15,7 +15,7 @@ interface Stats {
 }
 
 const Dashboard = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, isSuperadmin, isAdmin, isManager } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState<Stats>({
     totalLeads: 0,
@@ -40,37 +40,68 @@ const Dashboard = () => {
   const fetchStats = async () => {
     setStatsLoading(true);
     try {
+      // Build base query with role-based filtering
+      let totalLeadsQuery = supabase.from("leads").select("*", { count: "exact", head: true });
+      let newLeadsQuery = supabase.from("leads").select("*", { count: "exact", head: true });
+      
+      // If user is a manager, filter by assigned leads
+      if (isManager && !isSuperadmin && !isAdmin) {
+        totalLeadsQuery = totalLeadsQuery.eq("assigned_manager_id", user?.id);
+        newLeadsQuery = newLeadsQuery.eq("assigned_manager_id", user?.id);
+      }
+
       // Get total leads
-      const { count: totalCount } = await supabase
-        .from("leads")
-        .select("*", { count: "exact", head: true });
+      const { count: totalCount } = await totalLeadsQuery;
 
       // Get new leads (created this month)
       const startOfMonth = new Date();
       startOfMonth.setDate(1);
       startOfMonth.setHours(0, 0, 0, 0);
       
-      const { count: newCount } = await supabase
-        .from("leads")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", startOfMonth.toISOString());
+      const { count: newCount } = await newLeadsQuery.gte("created_at", startOfMonth.toISOString());
 
-      // Get hot leads
-      const { count: hotCount } = await supabase
+      // Get hot leads - need to join with leads table for manager filtering
+      let hotLeadsQuery = supabase
         .from("lead_tags")
-        .select("*", { count: "exact", head: true })
+        .select("lead_id", { count: "exact", head: true })
         .eq("tag", "hot");
+
+      if (isManager && !isSuperadmin && !isAdmin) {
+        // For managers, get their lead IDs first
+        const { data: managerLeads } = await supabase
+          .from("leads")
+          .select("id")
+          .eq("assigned_manager_id", user?.id);
+        
+        const leadIds = managerLeads?.map(l => l.id) || [];
+        hotLeadsQuery = hotLeadsQuery.in("lead_id", leadIds.length > 0 ? leadIds : ['00000000-0000-0000-0000-000000000000']);
+      }
+
+      const { count: hotCount } = await hotLeadsQuery;
 
       // Get called leads (this week)
       const startOfWeek = new Date();
       startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
       startOfWeek.setHours(0, 0, 0, 0);
       
-      const { count: calledCount } = await supabase
+      let calledLeadsQuery = supabase
         .from("lead_tags")
-        .select("*", { count: "exact", head: true })
+        .select("lead_id", { count: "exact", head: true })
         .eq("tag", "called")
         .gte("created_at", startOfWeek.toISOString());
+
+      if (isManager && !isSuperadmin && !isAdmin) {
+        // For managers, get their lead IDs first
+        const { data: managerLeads } = await supabase
+          .from("leads")
+          .select("id")
+          .eq("assigned_manager_id", user?.id);
+        
+        const leadIds = managerLeads?.map(l => l.id) || [];
+        calledLeadsQuery = calledLeadsQuery.in("lead_id", leadIds.length > 0 ? leadIds : ['00000000-0000-0000-0000-000000000000']);
+      }
+
+      const { count: calledCount } = await calledLeadsQuery;
 
       setStats({
         totalLeads: totalCount || 0,

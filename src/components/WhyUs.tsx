@@ -25,7 +25,7 @@ const WhyUs = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {benefits.map((benefit, index) => (
                 <div key={index} className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-success flex-shrink-0" />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0" color="#ED1B7B" />
                   <span className="opacity-90">{benefit}</span>
                 </div>
               ))}

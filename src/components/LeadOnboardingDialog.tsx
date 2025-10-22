@@ -115,11 +115,11 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
   const renderProgressIndicator = () => {
     const steps = [1, 2, 3, 4, 5];
     return (
-      <div className="flex items-center justify-center gap-2 sm:gap-4 mb-6 sm:mb-8">
+      <div className="flex items-center justify-center gap-1 sm:gap-2 mb-6 sm:mb-8 px-2">
         {steps.map((s) => (
           <div key={s} className="flex items-center">
             <div
-              className={`flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-full font-semibold text-sm sm:text-lg ${
+              className={`flex items-center justify-center w-8 h-8 sm:w-12 sm:h-12 rounded-full font-semibold text-xs sm:text-base ${
                 step >= s
                   ? "bg-[#3DD9E8] text-white"
                   : "bg-gray-200 text-gray-400"
@@ -128,7 +128,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
               {s < 10 ? `0${s}` : s}
             </div>
             {s < 5 && (
-              <div className={`w-8 sm:w-20 h-0.5 border-t-2 border-dashed ${
+              <div className={`w-4 sm:w-12 h-0.5 border-t-2 border-dashed ${
                 step > s ? "border-[#3DD9E8]" : "border-gray-300"
               }`} />
             )}
@@ -140,7 +140,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-6 md:p-8" aria-describedby="lead-dialog-description">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-3 sm:p-6 md:p-8 w-[95vw] sm:w-full" aria-describedby="lead-dialog-description">
         <div className="sr-only" id="lead-dialog-description">
           Complete this form to get matched with the best home care services for your needs
         </div>

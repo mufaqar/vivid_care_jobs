@@ -140,7 +140,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 md:p-8" aria-describedby="lead-dialog-description">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-6 md:p-8" aria-describedby="lead-dialog-description">
         <div className="sr-only" id="lead-dialog-description">
           Complete this form to get matched with the best home care services for your needs
         </div>

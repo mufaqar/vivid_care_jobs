@@ -22,10 +22,10 @@ export const DashboardHeader = () => {
   };
 
   return (
-    <header className="h-14 border-b flex items-center justify-between px-4 bg-card">
+    <header className="sticky top-0 z-40 h-14 border-b flex items-center justify-between px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex items-center gap-4">
         <SidebarTrigger />
-        <h1 className="text-lg font-semibold">Lead Management System</h1>
+        <h1 className="text-lg font-semibold truncate">Lead Management System</h1>
       </div>
       
       <DropdownMenu>

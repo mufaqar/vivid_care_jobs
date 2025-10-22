@@ -9,7 +9,7 @@ const Hero = () => {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-              Available Healthcare Jobs
+              <span style={{ color: '#ED1B7B' }}>Available</span> Healthcare Jobs
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
               Join our team of dedicated healthcare professionals. We have exciting opportunities across various roles to help you grow your career in healthcare.

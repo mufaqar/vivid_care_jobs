@@ -15,6 +15,7 @@ import { LeadFilters } from "@/pages/LeadsPage";
 import { Loader2, Plus } from "lucide-react";
 import { LeadDetailsDialog } from "./LeadDetailsDialog";
 import { format } from "date-fns";
+import { toast } from "@/hooks/use-toast";
 
 interface Lead {
   id: string;
@@ -101,10 +102,15 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error loading leads",
+          description: "Unable to fetch leads data",
+        });
+        return;
+      }
       setLeads(data || []);
-    } catch (error) {
-      console.error("Error fetching leads:", error);
     } finally {
       setLoading(false);
     }

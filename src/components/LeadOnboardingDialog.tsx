@@ -7,6 +7,23 @@ import { Input } from "@/components/ui/input";
 import { X, Check, Mail, Phone, User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+
+const contactSchema = z.object({
+  contactName: z.string()
+    .trim()
+    .min(1, "Name is required")
+    .max(100, "Name must be less than 100 characters"),
+  email: z.string()
+    .trim()
+    .email("Please enter a valid email address")
+    .max(255, "Email must be less than 255 characters"),
+  phone: z.string()
+    .trim()
+    .min(1, "Phone number is required")
+    .regex(/^[\d\s\-\+\(\)]+$/, "Please enter a valid phone number")
+    .max(20, "Phone number must be less than 20 characters"),
+});
 
 interface LeadOnboardingDialogProps {
   open: boolean;
@@ -35,10 +52,16 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
   const handleSubmit = async () => {
     // Validate form
-    if (!formData.contactName || !formData.email || !formData.phone) {
+    const result = contactSchema.safeParse({
+      contactName: formData.contactName,
+      email: formData.email,
+      phone: formData.phone,
+    });
+
+    if (!result.success) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
+        title: "Validation Error",
+        description: result.error.errors[0].message,
         variant: "destructive",
       });
       return;
@@ -53,9 +76,9 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
         visit_frequency: formData.visitFrequency,
         care_duration: formData.careDuration,
         priority: formData.priority,
-        contact_name: formData.contactName,
-        contact_email: formData.email,
-        contact_phone: formData.phone,
+        contact_name: result.data.contactName,
+        contact_email: result.data.email,
+        contact_phone: result.data.phone,
         created_by: user?.id || null,
       });
 
@@ -64,7 +87,6 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
       // Show success screen
       setStep(7);
     } catch (error) {
-      console.error("Error submitting lead:", error);
       toast({
         title: "Error",
         description: "There was an error submitting your information. Please try again.",

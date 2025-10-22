@@ -5,10 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Settings, User, Bell, Shield, Database } from "lucide-react";
+import { Settings, User, Bell, Shield, Database, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,13 +17,128 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { supabase } from "@/integrations/supabase/client";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
+interface UserNotificationSettings {
+  id: string;
+  user_id: string;
+  email_notifications: boolean;
+  lead_assignment_notifications: boolean;
+  profile?: {
+    full_name: string | null;
+    email: string | null;
+  };
+}
 
 const SettingsPage = () => {
-  const { user, userRole } = useAuth();
+  const { user, userRole, isSuperadmin } = useAuth();
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [leadAssignments, setLeadAssignments] = useState(true);
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
+  const [usersNotifications, setUsersNotifications] = useState<UserNotificationSettings[]>([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(true);
+
+  useEffect(() => {
+    if (isSuperadmin) {
+      fetchUsersNotifications();
+    }
+  }, [isSuperadmin]);
+
+  const fetchUsersNotifications = async () => {
+    setLoadingNotifications(true);
+    try {
+      // First get all profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name, email");
+
+      if (profilesError) throw profilesError;
+
+      // Then get notification settings for all users
+      const { data: settings, error: settingsError } = await supabase
+        .from("user_notification_settings")
+        .select("*");
+
+      if (settingsError) throw settingsError;
+
+      // Merge profiles with their settings
+      const merged = profiles?.map((profile) => {
+        const userSettings = settings?.find((s) => s.user_id === profile.id);
+        return {
+          id: userSettings?.id || "",
+          user_id: profile.id,
+          email_notifications: userSettings?.email_notifications ?? true,
+          lead_assignment_notifications: userSettings?.lead_assignment_notifications ?? true,
+          profile: {
+            full_name: profile.full_name,
+            email: profile.email,
+          },
+        };
+      }) || [];
+
+      setUsersNotifications(merged);
+    } catch (error) {
+      console.error("Error fetching user notifications:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load user notification settings",
+      });
+    } finally {
+      setLoadingNotifications(false);
+    }
+  };
+
+  const handleToggleNotification = async (
+    userId: string,
+    field: "email_notifications" | "lead_assignment_notifications",
+    currentValue: boolean
+  ) => {
+    try {
+      // Check if settings exist for this user
+      const { data: existing } = await supabase
+        .from("user_notification_settings")
+        .select("id")
+        .eq("user_id", userId)
+        .single();
+
+      if (existing) {
+        // Update existing settings
+        const { error } = await supabase
+          .from("user_notification_settings")
+          .update({ [field]: !currentValue })
+          .eq("user_id", userId);
+
+        if (error) throw error;
+      } else {
+        // Insert new settings
+        const { error } = await supabase
+          .from("user_notification_settings")
+          .insert({
+            user_id: userId,
+            [field]: !currentValue,
+          });
+
+        if (error) throw error;
+      }
+
+      toast({
+        title: "Settings updated",
+        description: "Notification preferences have been saved",
+      });
+
+      fetchUsersNotifications();
+    } catch (error) {
+      console.error("Error updating notification settings:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update notification settings",
+      });
+    }
+  };
 
   const handleSaveNotifications = () => {
     toast({
@@ -108,51 +223,127 @@ const SettingsPage = () => {
             </CardContent>
           </Card>
 
-          {/* Notifications */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                <CardTitle>Notifications</CardTitle>
-              </div>
-              <CardDescription>
-                Configure how you receive notifications
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Email Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive email updates about new leads
-                  </p>
+          {/* Notifications - Superadmin manages all users, others see their own */}
+          {isSuperadmin ? (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Bell className="h-5 w-5" />
+                  <CardTitle>Manage User Notifications</CardTitle>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setNotificationDialogOpen(true)}
-                >
-                  Configure
-                </Button>
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Lead Assignments</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Get notified when leads are assigned to you
-                  </p>
+                <CardDescription>
+                  Configure which users receive email notifications for Email Notifications and Lead Assignments
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loadingNotifications ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  </div>
+                ) : (
+                  <div className="rounded-lg border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>User</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Email Notifications</TableHead>
+                          <TableHead>Lead Assignments</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {usersNotifications.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                              No users found
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          usersNotifications.map((userNotif) => (
+                            <TableRow key={userNotif.user_id}>
+                              <TableCell className="font-medium">
+                                {userNotif.profile?.full_name || "Unknown"}
+                              </TableCell>
+                              <TableCell>{userNotif.profile?.email}</TableCell>
+                              <TableCell>
+                                <Switch
+                                  checked={userNotif.email_notifications}
+                                  onCheckedChange={() =>
+                                    handleToggleNotification(
+                                      userNotif.user_id,
+                                      "email_notifications",
+                                      userNotif.email_notifications
+                                    )
+                                  }
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Switch
+                                  checked={userNotif.lead_assignment_notifications}
+                                  onCheckedChange={() =>
+                                    handleToggleNotification(
+                                      userNotif.user_id,
+                                      "lead_assignment_notifications",
+                                      userNotif.lead_assignment_notifications
+                                    )
+                                  }
+                                />
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Bell className="h-5 w-5" />
+                  <CardTitle>Notifications</CardTitle>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setAssignmentDialogOpen(true)}
-                >
-                  Configure
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                <CardDescription>
+                  Configure how you receive notifications
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Email Notifications</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Receive email updates about new leads
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setNotificationDialogOpen(true)}
+                  >
+                    Configure
+                  </Button>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Lead Assignments</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Get notified when leads are assigned to you
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setAssignmentDialogOpen(true)}
+                  >
+                    Configure
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* System Settings */}
           {(userRole?.role === "superadmin" || userRole?.role === "admin") && (

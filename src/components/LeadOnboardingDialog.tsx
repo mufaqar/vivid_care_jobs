@@ -409,13 +409,13 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
             <h2 className="text-3xl font-bold text-center text-[#0B1D41]">
               Good! We're almost there.<br />Tell us the Postcode to attach to this
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-4 flex justify-center">
               <Input
                 type="text"
                 placeholder="Enter Postcode"
                 value={formData.postalCode}
                 onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                className="py-6 text-base text-center"
+                className="py-6 text-base text-center w-[70%]"
               />
             </div>
             <div className="flex gap-4 pt-4">

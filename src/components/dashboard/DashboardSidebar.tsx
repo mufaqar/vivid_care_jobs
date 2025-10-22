@@ -37,9 +37,9 @@ export const DashboardSidebar = () => {
 
   return (
     <Sidebar className={isCollapsed ? "w-14" : "w-60"}>
-      <SidebarContent className="gap-4 py-4">
+      <SidebarContent className="gap-4 py-4 bg-sidebar">
         <SidebarGroup>
-          <SidebarGroupLabel className="px-4 text-xs font-semibold uppercase tracking-wider">
+          <SidebarGroupLabel className="px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Main
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -66,7 +66,7 @@ export const DashboardSidebar = () => {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel className="px-4 text-xs font-semibold uppercase tracking-wider">
+          <SidebarGroupLabel className="px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Admin
           </SidebarGroupLabel>
           <SidebarGroupContent>

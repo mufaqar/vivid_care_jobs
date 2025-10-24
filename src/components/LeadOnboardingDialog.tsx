@@ -146,7 +146,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl h-[85vh] flex flex-col overflow-hidden p-4 sm:p-6 w-[95vw] sm:w-full" aria-describedby="lead-dialog-description">
+      <DialogContent className="max-w-2xl h-[90vh] flex flex-col overflow-hidden p-4 sm:p-6 w-[95vw] sm:w-full" aria-describedby="lead-dialog-description">
         <div className="sr-only" id="lead-dialog-description">
           Complete this form to get matched with the best home care services for your needs
         </div>
@@ -205,7 +205,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                   </Label>
                 </div>
               </RadioGroup>
-              <div className="flex gap-3 sm:gap-4 pt-2 justify-center">
+              <div className="flex gap-3 sm:gap-4 pt-2 pb-4 justify-center">
                 <Button
                   variant="outline"
                   onClick={handleBack}
@@ -268,7 +268,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 </Label>
               </div>
             </RadioGroup>
-            <div className="flex gap-3 sm:gap-4 pt-2 justify-center">
+            <div className="flex gap-3 sm:gap-4 pt-2 pb-4 justify-center">
               <Button
                 variant="outline"
                 onClick={handleBack}
@@ -330,7 +330,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 </Label>
               </div>
             </RadioGroup>
-            <div className="flex gap-3 sm:gap-4 pt-2 justify-center">
+            <div className="flex gap-3 sm:gap-4 pt-2 pb-4 justify-center">
               <Button
                 variant="outline"
                 onClick={handleBack}
@@ -392,7 +392,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 </Label>
               </div>
             </RadioGroup>
-            <div className="flex gap-3 sm:gap-4 pt-2 justify-center">
+            <div className="flex gap-3 sm:gap-4 pt-2 pb-4 justify-center">
               <Button
                 variant="outline"
                 onClick={handleBack}
@@ -426,7 +426,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 required
               />
             </div>
-            <div className="flex gap-3 sm:gap-4 pt-2 justify-center">
+            <div className="flex gap-3 sm:gap-4 pt-2 pb-4 justify-center">
               <Button
                 variant="outline"
                 onClick={handleBack}
@@ -476,7 +476,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 Now, we just need your details to complete your request.
               </p>
             </div>
-            <div className="flex flex-col gap-3 pt-2">
+            <div className="flex flex-col gap-3 pt-2 pb-4">
               <Button
                 onClick={handleNext}
                 className="w-full py-4 sm:py-6 text-sm sm:text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
@@ -496,7 +496,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
         {/* Step 7: Contact Form */}
         {step === 7 && (
-          <div className="space-y-4">
+          <div className="space-y-4 pb-4">
             <div className="text-center">
               <h2 className="text-xl sm:text-2xl font-bold text-[#0B1D41] mb-2">
                 What email or number would you<br />like the quote to be sent to?
@@ -549,7 +549,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
         {/* Step 8: Final Success */}
         {step === 8 && (
-          <div className="space-y-4 py-4 text-center">
+          <div className="space-y-4 py-4 pb-6 text-center">
             <div className="flex justify-center">
               <div className="relative">
                 <div className="text-5xl sm:text-6xl">📧</div>

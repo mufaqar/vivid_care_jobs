@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogClose, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -147,10 +147,10 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden p-0 w-[95vw] sm:w-full" aria-describedby="lead-dialog-description">
-        <div className="sr-only" id="lead-dialog-description">
+      <DialogContent className="max-w-2xl max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden p-0 w-[95vw] sm:w-full">
+        <DialogDescription className="sr-only">
           Complete this form to get matched with the best home care services for your needs
-        </div>
+        </DialogDescription>
         <DialogClose 
           className="absolute right-2 top-2 sm:right-3 sm:top-3 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 z-50"
           onClick={handleClose}

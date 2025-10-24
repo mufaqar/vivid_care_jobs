@@ -630,15 +630,15 @@ const UsersPage = () => {
         </AlertDialog>
 
         <Dialog open={addUserDialogOpen} onOpenChange={setAddUserDialogOpen}>
-          <DialogContent className="max-w-[95vw] sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
+          <DialogContent className="max-w-[95vw] sm:max-w-[500px] max-h-[90vh] overflow-y-auto p-6">
+            <DialogHeader className="space-y-2 pb-4">
               <DialogTitle>Add New User</DialogTitle>
               <DialogDescription>
                 Create a new user account with the specified role and permissions.
               </DialogDescription>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleCreateUser)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(handleCreateUser)} className="space-y-4 px-1">
                 <FormField
                   control={form.control}
                   name="email"

@@ -158,12 +158,12 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
           <span className="sr-only">Close</span>
         </DialogClose>
 
-        <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide px-4 sm:px-6 pt-4 sm:pt-6">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide px-4 sm:px-6 pt-4 sm:pt-6 pb-20">
           {step <= 5 && renderProgressIndicator()}
 
           {/* Step 1: Support Type */}
           {step === 1 && (
-            <div className="space-y-3 sm:space-y-4 pb-4">
+            <div className="space-y-3 sm:space-y-4">
               <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center text-[#0B1D41] leading-tight">
                 What type of support do you need<br className="hidden sm:block" /><span className="sm:hidden"> </span>from a live-in carer?
               </h2>
@@ -210,7 +210,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
         {/* Step 2: Visit Frequency */}
         {step === 2 && (
-          <div className="space-y-3 sm:space-y-4 pb-4">
+          <div className="space-y-3 sm:space-y-4">
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center text-[#0B1D41] leading-tight">
               How often would you like a home<br className="hidden sm:block" /><span className="sm:hidden"> </span>carer to visit?
             </h2>
@@ -257,7 +257,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
         {/* Step 3: Care Duration */}
         {step === 3 && (
-          <div className="space-y-3 sm:space-y-4 pb-4">
+          <div className="space-y-3 sm:space-y-4">
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center text-[#0B1D41] leading-tight">
               How long do you require<br className="hidden sm:block" /><span className="sm:hidden"> </span>live-in care?
             </h2>
@@ -304,7 +304,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
         {/* Step 4: Priority */}
         {step === 4 && (
-          <div className="space-y-3 sm:space-y-4 pb-4">
+          <div className="space-y-3 sm:space-y-4">
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center text-[#0B1D41] leading-tight">
               What is most important to you in<br className="hidden sm:block" /><span className="sm:hidden"> </span>choosing a home care service?
             </h2>
@@ -351,7 +351,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
         {/* Step 5: Postal Code */}
         {step === 5 && (
-          <div className="space-y-3 sm:space-y-4 pb-4">
+          <div className="space-y-3 sm:space-y-4">
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center text-[#0B1D41] leading-tight">
               Good! We're almost there.<br className="hidden sm:block" /><span className="sm:hidden"> </span>Tell us the Postcode to attach to this
             </h2>
@@ -486,7 +486,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
         {/* Fixed Footer with Navigation Buttons (Steps 1-5) */}
         {step >= 1 && step <= 5 && (
-          <div className="border-t bg-background px-4 sm:px-6 py-3 sm:py-4">
+          <div className="absolute bottom-0 left-0 right-0 border-t bg-background px-4 sm:px-6 py-3 sm:py-4">
             <div className="flex gap-3 sm:gap-4 justify-center">
               <Button
                 variant="outline"

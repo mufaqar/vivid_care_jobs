@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { X, Check, Mail, Phone, User } from "lucide-react";
+import { X, Check, Mail, Phone, User, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
@@ -37,6 +37,7 @@ interface LeadOnboardingDialogProps {
 
 const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps) => {
   const [step, setStep] = useState(1);
+  const [isSearching, setIsSearching] = useState(false);
   const [formData, setFormData] = useState({
     supportType: "companionship",
     visitFrequency: "twice-daily",
@@ -499,12 +500,12 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 variant="outline"
                 onClick={handleBack}
                 className="w-20 sm:w-28 py-2 sm:py-2.5 text-xs sm:text-sm"
-                disabled={step === 1}
+                disabled={step === 1 || isSearching}
               >
                 Back
               </Button>
               <Button
-                onClick={() => {
+                onClick={async () => {
                   if (step === 5) {
                     const postcodeValidation = z.string()
                       .trim()
@@ -520,12 +521,25 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                       });
                       return;
                     }
+                    
+                    // Show searching animation
+                    setIsSearching(true);
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    setIsSearching(false);
                   }
                   handleNext();
                 }}
                 className="w-20 sm:w-28 py-2 sm:py-2.5 text-xs sm:text-sm bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
+                disabled={isSearching}
               >
-                Continue
+                {isSearching && step === 5 ? (
+                  <>
+                    <Loader2 className="mr-1.5 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                    <span className="hidden sm:inline">Searching...</span>
+                  </>
+                ) : (
+                  "Continue"
+                )}
               </Button>
             </div>
           </div>

@@ -524,7 +524,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                     
                     // Show searching animation
                     setIsSearching(true);
-                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    await new Promise(resolve => setTimeout(resolve, 2000));
                     setIsSearching(false);
                   }
                   handleNext();

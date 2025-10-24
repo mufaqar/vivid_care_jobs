@@ -49,9 +49,10 @@ interface Lead {
 
 interface LeadsTableProps {
   filters: LeadFilters;
+  onLeadsCountChange?: (count: number) => void;
 }
 
-export const LeadsTable = ({ filters }: LeadsTableProps) => {
+export const LeadsTable = ({ filters, onLeadsCountChange }: LeadsTableProps) => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
@@ -127,7 +128,9 @@ export const LeadsTable = ({ filters }: LeadsTableProps) => {
         });
         return;
       }
-      setLeads(data || []);
+      const leadsData = data || [];
+      setLeads(leadsData);
+      onLeadsCountChange?.(leadsData.length);
     } finally {
       setLoading(false);
     }

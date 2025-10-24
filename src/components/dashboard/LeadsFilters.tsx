@@ -103,7 +103,7 @@ export const LeadsFilters = ({ filters, onFiltersChange }: LeadsFiltersProps) =>
             }
           >
             <SelectTrigger id="manager">
-              <SelectValue placeholder="All managers" />
+              <SelectValue placeholder="All users" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All managers</SelectItem>

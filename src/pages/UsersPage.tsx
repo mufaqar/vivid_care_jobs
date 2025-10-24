@@ -630,7 +630,7 @@ const UsersPage = () => {
         </AlertDialog>
 
         <Dialog open={addUserDialogOpen} onOpenChange={setAddUserDialogOpen}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="max-w-[95vw] sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New User</DialogTitle>
               <DialogDescription>
@@ -746,7 +746,7 @@ const UsersPage = () => {
                   )}
                 />
 
-                <DialogFooter>
+                <DialogFooter className="flex-col sm:flex-row gap-2">
                   <Button
                     type="button"
                     variant="outline"
@@ -755,10 +755,11 @@ const UsersPage = () => {
                       form.reset();
                     }}
                     disabled={isCreatingUser}
+                    className="w-full sm:w-auto"
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={isCreatingUser}>
+                  <Button type="submit" disabled={isCreatingUser} className="w-full sm:w-auto">
                     {isCreatingUser && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Create User
                   </Button>

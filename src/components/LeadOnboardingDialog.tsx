@@ -146,7 +146,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl h-[90vh] flex flex-col overflow-hidden p-3 sm:p-6 md:p-8 w-[95vw] sm:w-full" aria-describedby="lead-dialog-description">
+      <DialogContent className="max-w-2xl h-[85vh] flex flex-col overflow-hidden p-4 sm:p-6 w-[95vw] sm:w-full" aria-describedby="lead-dialog-description">
         <div className="sr-only" id="lead-dialog-description">
           Complete this form to get matched with the best home care services for your needs
         </div>
@@ -158,7 +158,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
           <span className="sr-only">Close</span>
         </DialogClose>
 
-        <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+        <div className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden min-h-0 scrollbar-hide">
           {step <= 5 && renderProgressIndicator()}
 
           {/* Step 1: Support Type */}

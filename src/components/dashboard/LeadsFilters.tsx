@@ -95,7 +95,7 @@ export const LeadsFilters = ({ filters, onFiltersChange }: LeadsFiltersProps) =>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="manager">Manager</Label>
+          <Label htmlFor="manager">Assign to</Label>
           <Select
             value={filters.assignedManager}
             onValueChange={(value) =>

@@ -146,7 +146,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl h-[90vh] flex flex-col overflow-hidden p-4 sm:p-6 w-[95vw] sm:w-full" aria-describedby="lead-dialog-description">
+      <DialogContent className="max-w-2xl h-[90vh] flex flex-col overflow-hidden p-0 w-[95vw] sm:w-full" aria-describedby="lead-dialog-description">
         <div className="sr-only" id="lead-dialog-description">
           Complete this form to get matched with the best home care services for your needs
         </div>
@@ -158,12 +158,12 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
           <span className="sr-only">Close</span>
         </DialogClose>
 
-        <div className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden min-h-0 scrollbar-hide">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide px-4 sm:px-6 pt-4 sm:pt-6">
           {step <= 5 && renderProgressIndicator()}
 
           {/* Step 1: Support Type */}
           {step === 1 && (
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-3 sm:space-y-4 pb-4">
               <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center text-[#0B1D41] leading-tight">
                 What type of support do you need<br className="hidden sm:block" /><span className="sm:hidden"> </span>from a live-in carer?
               </h2>
@@ -205,28 +205,12 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                   </Label>
                 </div>
               </RadioGroup>
-              <div className="flex gap-3 sm:gap-4 pt-2 pb-4 justify-center">
-                <Button
-                  variant="outline"
-                  onClick={handleBack}
-                  className="w-24 sm:w-32 py-3 sm:py-4 text-sm sm:text-base"
-                  disabled={step === 1}
-                >
-                  Back
-                </Button>
-                <Button
-                  onClick={handleNext}
-                  className="w-24 sm:w-32 py-3 sm:py-4 text-sm sm:text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
-                >
-                  Continue
-              </Button>
             </div>
-          </div>
-        )}
+          )}
 
         {/* Step 2: Visit Frequency */}
         {step === 2 && (
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-3 sm:space-y-4 pb-4">
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center text-[#0B1D41] leading-tight">
               How often would you like a home<br className="hidden sm:block" /><span className="sm:hidden"> </span>carer to visit?
             </h2>
@@ -268,27 +252,12 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 </Label>
               </div>
             </RadioGroup>
-            <div className="flex gap-3 sm:gap-4 pt-2 pb-4 justify-center">
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                className="w-24 sm:w-32 py-3 sm:py-4 text-sm sm:text-base"
-              >
-                Back
-              </Button>
-              <Button
-                onClick={handleNext}
-                className="w-24 sm:w-32 py-3 sm:py-4 text-sm sm:text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
-              >
-                Continue
-              </Button>
-            </div>
           </div>
         )}
 
         {/* Step 3: Care Duration */}
         {step === 3 && (
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-3 sm:space-y-4 pb-4">
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center text-[#0B1D41] leading-tight">
               How long do you require<br className="hidden sm:block" /><span className="sm:hidden"> </span>live-in care?
             </h2>
@@ -330,27 +299,12 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 </Label>
               </div>
             </RadioGroup>
-            <div className="flex gap-3 sm:gap-4 pt-2 pb-4 justify-center">
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                className="w-24 sm:w-32 py-3 sm:py-4 text-sm sm:text-base"
-              >
-                Back
-              </Button>
-              <Button
-                onClick={handleNext}
-                className="w-24 sm:w-32 py-3 sm:py-4 text-sm sm:text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
-              >
-                Continue
-              </Button>
-            </div>
           </div>
         )}
 
         {/* Step 4: Priority */}
         {step === 4 && (
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-3 sm:space-y-4 pb-4">
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center text-[#0B1D41] leading-tight">
               What is most important to you in<br className="hidden sm:block" /><span className="sm:hidden"> </span>choosing a home care service?
             </h2>
@@ -392,27 +346,12 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 </Label>
               </div>
             </RadioGroup>
-            <div className="flex gap-3 sm:gap-4 pt-2 pb-4 justify-center">
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                className="w-24 sm:w-32 py-3 sm:py-4 text-sm sm:text-base"
-              >
-                Back
-              </Button>
-              <Button
-                onClick={handleNext}
-                className="w-24 sm:w-32 py-3 sm:py-4 text-sm sm:text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
-              >
-                Continue
-              </Button>
-            </div>
           </div>
         )}
 
         {/* Step 5: Postal Code */}
         {step === 5 && (
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-3 sm:space-y-4 pb-4">
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center text-[#0B1D41] leading-tight">
               Good! We're almost there.<br className="hidden sm:block" /><span className="sm:hidden"> </span>Tell us the Postcode to attach to this
             </h2>
@@ -425,37 +364,6 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
                 className="py-3 sm:py-4 text-sm sm:text-base text-center w-full sm:w-[70%]"
                 required
               />
-            </div>
-            <div className="flex gap-3 sm:gap-4 pt-2 pb-4 justify-center">
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                className="w-24 sm:w-32 py-3 sm:py-4 text-sm sm:text-base"
-              >
-                Back
-              </Button>
-              <Button
-                onClick={() => {
-                  const postcodeValidation = z.string()
-                    .trim()
-                    .min(1, "Postcode is required")
-                    .regex(/^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i, "Please enter a valid UK postcode")
-                    .safeParse(formData.postalCode);
-                  
-                  if (!postcodeValidation.success) {
-                    toast({
-                      title: "Invalid Postcode",
-                      description: postcodeValidation.error.errors[0].message,
-                      variant: "destructive",
-                    });
-                    return;
-                  }
-                  handleNext();
-                }}
-                className="w-24 sm:w-32 py-3 sm:py-4 text-sm sm:text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
-              >
-                Continue
-              </Button>
             </div>
           </div>
         )}
@@ -549,7 +457,7 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
 
         {/* Step 8: Final Success */}
         {step === 8 && (
-          <div className="space-y-4 py-4 pb-6 text-center">
+          <div className="space-y-4 py-4 text-center">
             <div className="flex justify-center">
               <div className="relative">
                 <div className="text-5xl sm:text-6xl">📧</div>
@@ -575,6 +483,46 @@ const LeadOnboardingDialog = ({ open, onOpenChange }: LeadOnboardingDialogProps)
           </div>
         )}
         </div>
+
+        {/* Fixed Footer with Navigation Buttons (Steps 1-5) */}
+        {step >= 1 && step <= 5 && (
+          <div className="border-t bg-background px-4 sm:px-6 py-3 sm:py-4">
+            <div className="flex gap-3 sm:gap-4 justify-center">
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                className="w-24 sm:w-32 py-3 sm:py-4 text-sm sm:text-base"
+                disabled={step === 1}
+              >
+                Back
+              </Button>
+              <Button
+                onClick={() => {
+                  if (step === 5) {
+                    const postcodeValidation = z.string()
+                      .trim()
+                      .min(1, "Postcode is required")
+                      .regex(/^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i, "Please enter a valid UK postcode")
+                      .safeParse(formData.postalCode);
+                    
+                    if (!postcodeValidation.success) {
+                      toast({
+                        title: "Invalid Postcode",
+                        description: postcodeValidation.error.errors[0].message,
+                        variant: "destructive",
+                      });
+                      return;
+                    }
+                  }
+                  handleNext();
+                }}
+                className="w-24 sm:w-32 py-3 sm:py-4 text-sm sm:text-base bg-[#ED1B7B] hover:bg-[#ED1B7B]/90 text-white"
+              >
+                Continue
+              </Button>
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

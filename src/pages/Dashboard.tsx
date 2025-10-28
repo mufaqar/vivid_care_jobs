@@ -95,6 +95,10 @@ const Dashboard = () => {
           startDate = new Date(now.getFullYear(), 0, 1);
           endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
           break;
+        case "last_year":
+          startDate = new Date(now.getFullYear() - 1, 0, 1);
+          endDate = new Date(now.getFullYear(), 0, 1);
+          break;
         default:
           startDate.setDate(now.getDate() - 6);
           endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
@@ -229,6 +233,11 @@ const Dashboard = () => {
           startDate = new Date(now.getFullYear(), 0, 1);
           dateFormat = { month: "short" };
           break;
+        case "last_year":
+          days = 12;
+          startDate = new Date(now.getFullYear() - 1, 0, 1);
+          dateFormat = { month: "short", year: "numeric" };
+          break;
         default:
           days = 7;
           startDate.setDate(now.getDate() - 6);
@@ -285,9 +294,9 @@ const Dashboard = () => {
           });
         }
       } 
-      // For monthly data (last 6 months, year)
-      else if (timeFilter === "last_6_months" || timeFilter === "year") {
-        const monthCount = timeFilter === "year" ? 12 : 6;
+      // For monthly data (last 6 months, year, last year)
+      else if (timeFilter === "last_6_months" || timeFilter === "year" || timeFilter === "last_year") {
+        const monthCount = timeFilter === "year" || timeFilter === "last_year" ? 12 : 6;
         for (let i = 0; i < monthCount; i++) {
           const date = new Date(startDate);
           date.setMonth(startDate.getMonth() + i);
@@ -427,6 +436,7 @@ const Dashboard = () => {
               <SelectItem value="this_month">This Month</SelectItem>
               <SelectItem value="last_6_months">Last 6 Months</SelectItem>
               <SelectItem value="year">Year</SelectItem>
+              <SelectItem value="last_year">Last Year</SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -54,39 +54,50 @@ const Dashboard = () => {
     try {
       const now = new Date();
       let startDate = new Date();
+      let endDate = new Date();
 
-      // Calculate start date based on filter
+      // Calculate start date and end date based on filter
       switch (timeFilter) {
         case "today":
           startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
           break;
         case "yesterday":
           startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
           break;
         case "last_7_days":
           startDate.setDate(now.getDate() - 6);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
           break;
         case "last_2_weeks":
           startDate.setDate(now.getDate() - 13);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
           break;
         case "last_30_days":
           startDate.setDate(now.getDate() - 29);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
           break;
         case "last_month":
           startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+          endDate = new Date(now.getFullYear(), now.getMonth(), 1);
           break;
         case "last_6_months":
           startDate.setMonth(now.getMonth() - 5);
           startDate.setDate(1);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
           break;
         case "year":
           startDate = new Date(now.getFullYear(), 0, 1);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
           break;
         default:
           startDate.setDate(now.getDate() - 6);
+          endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
       }
 
       startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(0, 0, 0, 0);
 
       // Build base query with role-based filtering
       let totalLeadsQuery = supabase.from("leads").select("*", { count: "exact", head: true });
@@ -99,8 +110,8 @@ const Dashboard = () => {
       }
 
       // Apply date filter to both queries
-      totalLeadsQuery = totalLeadsQuery.gte("created_at", startDate.toISOString());
-      newLeadsQuery = newLeadsQuery.gte("created_at", startDate.toISOString()).eq("status", "new");
+      totalLeadsQuery = totalLeadsQuery.gte("created_at", startDate.toISOString()).lt("created_at", endDate.toISOString());
+      newLeadsQuery = newLeadsQuery.gte("created_at", startDate.toISOString()).lt("created_at", endDate.toISOString()).eq("status", "new");
 
       // Get total leads in time period
       const { count: totalCount } = await totalLeadsQuery;
@@ -113,7 +124,8 @@ const Dashboard = () => {
         .from("lead_tags")
         .select("lead_id, created_at", { count: "exact", head: true })
         .eq("tag", "hot")
-        .gte("created_at", startDate.toISOString());
+        .gte("created_at", startDate.toISOString())
+        .lt("created_at", endDate.toISOString());
 
       if (isManager && !isSuperadmin && !isAdmin) {
         // For managers, get their lead IDs first
@@ -133,7 +145,8 @@ const Dashboard = () => {
         .from("lead_tags")
         .select("lead_id, created_at", { count: "exact", head: true })
         .eq("tag", "called")
-        .gte("created_at", startDate.toISOString());
+        .gte("created_at", startDate.toISOString())
+        .lt("created_at", endDate.toISOString());
 
       if (isManager && !isSuperadmin && !isAdmin) {
         // For managers, get their lead IDs first

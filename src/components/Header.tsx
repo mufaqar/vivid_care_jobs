@@ -48,8 +48,8 @@ const Header: React.FC = () => {
   return (
     <header
       className={`fixed w-full z-[999] transition-all duration-500 ease-in-out ${
-        isScrolled ? "py-2 bg-primary" : "py-[18px]"
-      } ${mblMenu ? "bg-primary" : ""}`}
+        isScrolled ? "py-2 bg-col_blue" : "py-[18px]"
+      } ${mblMenu ? "bg-col_blue" : ""}`}
     >
       <div className="mx-auto md:px-[2%] px-4 flex flex-row gap-6 items-center justify-between">
         {/* ✅ Logo */}

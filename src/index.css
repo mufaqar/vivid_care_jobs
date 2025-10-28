@@ -20,8 +20,10 @@ All colors MUST be HSL.
     --popover-foreground: 220 70% 15%;
 
     /* Dark navy primary (for dark sections) */
-    --primary: 220 70% 15%;
+    --primary: 194 84% 15%;
     --primary-foreground: 0 0% 98%;
+
+     --col_blue:#129ace;
 
     /* Light secondary */
     --secondary: 270 40% 95%;

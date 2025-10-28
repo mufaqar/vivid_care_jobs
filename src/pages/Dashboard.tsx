@@ -52,6 +52,42 @@ const Dashboard = () => {
   const fetchStats = async () => {
     setStatsLoading(true);
     try {
+      const now = new Date();
+      let startDate = new Date();
+
+      // Calculate start date based on filter
+      switch (timeFilter) {
+        case "today":
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          break;
+        case "yesterday":
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+          break;
+        case "last_7_days":
+          startDate.setDate(now.getDate() - 6);
+          break;
+        case "last_2_weeks":
+          startDate.setDate(now.getDate() - 13);
+          break;
+        case "last_30_days":
+          startDate.setDate(now.getDate() - 29);
+          break;
+        case "last_month":
+          startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+          break;
+        case "last_6_months":
+          startDate.setMonth(now.getMonth() - 5);
+          startDate.setDate(1);
+          break;
+        case "year":
+          startDate = new Date(now.getFullYear(), 0, 1);
+          break;
+        default:
+          startDate.setDate(now.getDate() - 6);
+      }
+
+      startDate.setHours(0, 0, 0, 0);
+
       // Build base query with role-based filtering
       let totalLeadsQuery = supabase.from("leads").select("*", { count: "exact", head: true });
       let newLeadsQuery = supabase.from("leads").select("*", { count: "exact", head: true });
@@ -62,21 +98,22 @@ const Dashboard = () => {
         newLeadsQuery = newLeadsQuery.eq("assigned_manager_id", user?.id);
       }
 
-      // Get total leads
+      // Apply date filter to both queries
+      totalLeadsQuery = totalLeadsQuery.gte("created_at", startDate.toISOString());
+      newLeadsQuery = newLeadsQuery.gte("created_at", startDate.toISOString()).eq("status", "new");
+
+      // Get total leads in time period
       const { count: totalCount } = await totalLeadsQuery;
 
-      // Get new leads (created this month)
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
-      
-      const { count: newCount } = await newLeadsQuery.gte("created_at", startOfMonth.toISOString());
+      // Get new leads in time period
+      const { count: newCount } = await newLeadsQuery;
 
       // Get hot leads - need to join with leads table for manager filtering
       let hotLeadsQuery = supabase
         .from("lead_tags")
-        .select("lead_id", { count: "exact", head: true })
-        .eq("tag", "hot");
+        .select("lead_id, created_at", { count: "exact", head: true })
+        .eq("tag", "hot")
+        .gte("created_at", startDate.toISOString());
 
       if (isManager && !isSuperadmin && !isAdmin) {
         // For managers, get their lead IDs first
@@ -91,16 +128,12 @@ const Dashboard = () => {
 
       const { count: hotCount } = await hotLeadsQuery;
 
-      // Get called leads (this week)
-      const startOfWeek = new Date();
-      startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
-      startOfWeek.setHours(0, 0, 0, 0);
-      
+      // Get called leads in time period
       let calledLeadsQuery = supabase
         .from("lead_tags")
-        .select("lead_id", { count: "exact", head: true })
+        .select("lead_id, created_at", { count: "exact", head: true })
         .eq("tag", "called")
-        .gte("created_at", startOfWeek.toISOString());
+        .gte("created_at", startDate.toISOString());
 
       if (isManager && !isSuperadmin && !isAdmin) {
         // For managers, get their lead IDs first
@@ -352,11 +385,28 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-          <p className="text-muted-foreground">
-            Welcome back! Here's an overview of your leads.
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+            <p className="text-muted-foreground">
+              Welcome back! Here's an overview of your leads.
+            </p>
+          </div>
+          <Select value={timeFilter} onValueChange={setTimeFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="yesterday">Yesterday</SelectItem>
+              <SelectItem value="last_7_days">Last 7 Days</SelectItem>
+              <SelectItem value="last_2_weeks">Last 2 Weeks</SelectItem>
+              <SelectItem value="last_30_days">Last 30 Days</SelectItem>
+              <SelectItem value="last_month">Last Month</SelectItem>
+              <SelectItem value="last_6_months">Last 6 Months</SelectItem>
+              <SelectItem value="year">Year</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -367,7 +417,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalLeads}</div>
-              <p className="text-xs opacity-70">All time</p>
+              <p className="text-xs opacity-70">In selected period</p>
             </CardContent>
           </Card>
 
@@ -378,7 +428,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.newLeads}</div>
-              <p className="text-xs opacity-70">This month</p>
+              <p className="text-xs opacity-70">In selected period</p>
             </CardContent>
           </Card>
 
@@ -389,7 +439,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.hotLeads}</div>
-              <p className="text-xs opacity-70">Requires attention</p>
+              <p className="text-xs opacity-70">In selected period</p>
             </CardContent>
           </Card>
 
@@ -400,31 +450,14 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.calledLeads}</div>
-              <p className="text-xs opacity-70">This week</p>
+              <p className="text-xs opacity-70">In selected period</p>
             </CardContent>
           </Card>
         </div>
 
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Leads Overview</CardTitle>
-              <Select value={timeFilter} onValueChange={setTimeFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="today">Today</SelectItem>
-                  <SelectItem value="yesterday">Yesterday</SelectItem>
-                  <SelectItem value="last_7_days">Last 7 Days</SelectItem>
-                  <SelectItem value="last_2_weeks">Last 2 Weeks</SelectItem>
-                  <SelectItem value="last_30_days">Last 30 Days</SelectItem>
-                  <SelectItem value="last_month">Last Month</SelectItem>
-                  <SelectItem value="last_6_months">Last 6 Months</SelectItem>
-                  <SelectItem value="year">Year</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <CardTitle>Leads Overview</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>

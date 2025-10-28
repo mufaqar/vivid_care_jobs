@@ -82,6 +82,10 @@ const Dashboard = () => {
           startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
           endDate = new Date(now.getFullYear(), now.getMonth(), 1);
           break;
+        case "this_month":
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+          break;
         case "last_6_months":
           startDate.setMonth(now.getMonth() - 5);
           startDate.setDate(1);
@@ -210,6 +214,10 @@ const Dashboard = () => {
           startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
           const lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
           days = lastMonth.getDate();
+          break;
+        case "this_month":
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          days = now.getDate();
           break;
         case "last_6_months":
           days = 6;
@@ -416,6 +424,7 @@ const Dashboard = () => {
               <SelectItem value="last_2_weeks">Last 2 Weeks</SelectItem>
               <SelectItem value="last_30_days">Last 30 Days</SelectItem>
               <SelectItem value="last_month">Last Month</SelectItem>
+              <SelectItem value="this_month">This Month</SelectItem>
               <SelectItem value="last_6_months">Last 6 Months</SelectItem>
               <SelectItem value="year">Year</SelectItem>
             </SelectContent>

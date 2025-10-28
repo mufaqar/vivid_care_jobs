@@ -7,6 +7,7 @@ import { Users, UserCheck, Phone, Flame } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Stats {
   totalLeads: number;
@@ -33,6 +34,7 @@ const Dashboard = () => {
   });
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [timeFilter, setTimeFilter] = useState("last_7_days");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -45,7 +47,7 @@ const Dashboard = () => {
       fetchStats();
       fetchChartData();
     }
-  }, [user]);
+  }, [user, timeFilter]);
 
   const fetchStats = async () => {
     setStatsLoading(true);
@@ -128,58 +130,205 @@ const Dashboard = () => {
 
   const fetchChartData = async () => {
     try {
-      // Get leads from the last 7 days
-      const days = 7;
       const chartDataArray: ChartData[] = [];
+      const now = new Date();
+      let startDate = new Date();
+      let days = 7;
+      let dateFormat: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
 
-      for (let i = days - 1; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        date.setHours(0, 0, 0, 0);
-        
-        const nextDate = new Date(date);
-        nextDate.setDate(nextDate.getDate() + 1);
+      // Calculate start date and number of days based on filter
+      switch (timeFilter) {
+        case "today":
+          days = 1;
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          dateFormat = { hour: "2-digit", minute: "2-digit" };
+          break;
+        case "yesterday":
+          days = 1;
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+          dateFormat = { hour: "2-digit", minute: "2-digit" };
+          break;
+        case "last_7_days":
+          days = 7;
+          startDate.setDate(now.getDate() - 6);
+          break;
+        case "last_2_weeks":
+          days = 14;
+          startDate.setDate(now.getDate() - 13);
+          break;
+        case "last_30_days":
+          days = 30;
+          startDate.setDate(now.getDate() - 29);
+          break;
+        case "last_month":
+          startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+          const lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+          days = lastMonth.getDate();
+          break;
+        case "last_6_months":
+          days = 6;
+          startDate.setMonth(now.getMonth() - 5);
+          dateFormat = { month: "short", year: "numeric" };
+          break;
+        case "year":
+          days = 12;
+          startDate = new Date(now.getFullYear(), 0, 1);
+          dateFormat = { month: "short" };
+          break;
+        default:
+          days = 7;
+          startDate.setDate(now.getDate() - 6);
+      }
 
-        // Build base queries with role-based filtering
-        let leadsQuery = supabase
-          .from("leads")
-          .select("*", { count: "exact", head: true })
-          .gte("created_at", date.toISOString())
-          .lt("created_at", nextDate.toISOString());
+      startDate.setHours(0, 0, 0, 0);
 
-        let contactedQuery = supabase
-          .from("leads")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "contacted")
-          .gte("created_at", date.toISOString())
-          .lt("created_at", nextDate.toISOString());
+      // For hourly data (today/yesterday)
+      if (timeFilter === "today" || timeFilter === "yesterday") {
+        for (let i = 0; i < 24; i++) {
+          const date = new Date(startDate);
+          date.setHours(i);
+          
+          const nextHour = new Date(date);
+          nextHour.setHours(i + 1);
 
-        let convertedQuery = supabase
-          .from("leads")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "converted")
-          .gte("created_at", date.toISOString())
-          .lt("created_at", nextDate.toISOString());
+          let leadsQuery = supabase
+            .from("leads")
+            .select("*", { count: "exact", head: true })
+            .gte("created_at", date.toISOString())
+            .lt("created_at", nextHour.toISOString());
 
-        // If user is a manager, filter by assigned leads
-        if (isManager && !isSuperadmin && !isAdmin) {
-          leadsQuery = leadsQuery.eq("assigned_manager_id", user?.id);
-          contactedQuery = contactedQuery.eq("assigned_manager_id", user?.id);
-          convertedQuery = convertedQuery.eq("assigned_manager_id", user?.id);
+          let contactedQuery = supabase
+            .from("leads")
+            .select("*", { count: "exact", head: true })
+            .eq("status", "contacted")
+            .gte("created_at", date.toISOString())
+            .lt("created_at", nextHour.toISOString());
+
+          let convertedQuery = supabase
+            .from("leads")
+            .select("*", { count: "exact", head: true })
+            .eq("status", "converted")
+            .gte("created_at", date.toISOString())
+            .lt("created_at", nextHour.toISOString());
+
+          if (isManager && !isSuperadmin && !isAdmin) {
+            leadsQuery = leadsQuery.eq("assigned_manager_id", user?.id);
+            contactedQuery = contactedQuery.eq("assigned_manager_id", user?.id);
+            convertedQuery = convertedQuery.eq("assigned_manager_id", user?.id);
+          }
+
+          const [{ count: leadsCount }, { count: contactedCount }, { count: convertedCount }] = await Promise.all([
+            leadsQuery,
+            contactedQuery,
+            convertedQuery,
+          ]);
+
+          chartDataArray.push({
+            date: `${i}:00`,
+            leads: leadsCount || 0,
+            contacted: contactedCount || 0,
+            converted: convertedCount || 0,
+          });
         }
+      } 
+      // For monthly data (last 6 months, year)
+      else if (timeFilter === "last_6_months" || timeFilter === "year") {
+        const monthCount = timeFilter === "year" ? 12 : 6;
+        for (let i = 0; i < monthCount; i++) {
+          const date = new Date(startDate);
+          date.setMonth(startDate.getMonth() + i);
+          
+          const nextMonth = new Date(date);
+          nextMonth.setMonth(date.getMonth() + 1);
 
-        const [{ count: leadsCount }, { count: contactedCount }, { count: convertedCount }] = await Promise.all([
-          leadsQuery,
-          contactedQuery,
-          convertedQuery,
-        ]);
+          let leadsQuery = supabase
+            .from("leads")
+            .select("*", { count: "exact", head: true })
+            .gte("created_at", date.toISOString())
+            .lt("created_at", nextMonth.toISOString());
 
-        chartDataArray.push({
-          date: date.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-          leads: leadsCount || 0,
-          contacted: contactedCount || 0,
-          converted: convertedCount || 0,
-        });
+          let contactedQuery = supabase
+            .from("leads")
+            .select("*", { count: "exact", head: true })
+            .eq("status", "contacted")
+            .gte("created_at", date.toISOString())
+            .lt("created_at", nextMonth.toISOString());
+
+          let convertedQuery = supabase
+            .from("leads")
+            .select("*", { count: "exact", head: true })
+            .eq("status", "converted")
+            .gte("created_at", date.toISOString())
+            .lt("created_at", nextMonth.toISOString());
+
+          if (isManager && !isSuperadmin && !isAdmin) {
+            leadsQuery = leadsQuery.eq("assigned_manager_id", user?.id);
+            contactedQuery = contactedQuery.eq("assigned_manager_id", user?.id);
+            convertedQuery = convertedQuery.eq("assigned_manager_id", user?.id);
+          }
+
+          const [{ count: leadsCount }, { count: contactedCount }, { count: convertedCount }] = await Promise.all([
+            leadsQuery,
+            contactedQuery,
+            convertedQuery,
+          ]);
+
+          chartDataArray.push({
+            date: date.toLocaleDateString("en-US", dateFormat),
+            leads: leadsCount || 0,
+            contacted: contactedCount || 0,
+            converted: convertedCount || 0,
+          });
+        }
+      }
+      // For daily data (default)
+      else {
+        for (let i = 0; i < days; i++) {
+          const date = new Date(startDate);
+          date.setDate(startDate.getDate() + i);
+          
+          const nextDate = new Date(date);
+          nextDate.setDate(nextDate.getDate() + 1);
+
+          let leadsQuery = supabase
+            .from("leads")
+            .select("*", { count: "exact", head: true })
+            .gte("created_at", date.toISOString())
+            .lt("created_at", nextDate.toISOString());
+
+          let contactedQuery = supabase
+            .from("leads")
+            .select("*", { count: "exact", head: true })
+            .eq("status", "contacted")
+            .gte("created_at", date.toISOString())
+            .lt("created_at", nextDate.toISOString());
+
+          let convertedQuery = supabase
+            .from("leads")
+            .select("*", { count: "exact", head: true })
+            .eq("status", "converted")
+            .gte("created_at", date.toISOString())
+            .lt("created_at", nextDate.toISOString());
+
+          if (isManager && !isSuperadmin && !isAdmin) {
+            leadsQuery = leadsQuery.eq("assigned_manager_id", user?.id);
+            contactedQuery = contactedQuery.eq("assigned_manager_id", user?.id);
+            convertedQuery = convertedQuery.eq("assigned_manager_id", user?.id);
+          }
+
+          const [{ count: leadsCount }, { count: contactedCount }, { count: convertedCount }] = await Promise.all([
+            leadsQuery,
+            contactedQuery,
+            convertedQuery,
+          ]);
+
+          chartDataArray.push({
+            date: date.toLocaleDateString("en-US", dateFormat),
+            leads: leadsCount || 0,
+            contacted: contactedCount || 0,
+            converted: convertedCount || 0,
+          });
+        }
       }
 
       setChartData(chartDataArray);
@@ -258,7 +407,24 @@ const Dashboard = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Leads Overview - Last 7 Days</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Leads Overview</CardTitle>
+              <Select value={timeFilter} onValueChange={setTimeFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="today">Today</SelectItem>
+                  <SelectItem value="yesterday">Yesterday</SelectItem>
+                  <SelectItem value="last_7_days">Last 7 Days</SelectItem>
+                  <SelectItem value="last_2_weeks">Last 2 Weeks</SelectItem>
+                  <SelectItem value="last_30_days">Last 30 Days</SelectItem>
+                  <SelectItem value="last_month">Last Month</SelectItem>
+                  <SelectItem value="last_6_months">Last 6 Months</SelectItem>
+                  <SelectItem value="year">Year</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>

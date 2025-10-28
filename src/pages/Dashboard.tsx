@@ -6,12 +6,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, UserCheck, Phone, Flame } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 interface Stats {
   totalLeads: number;
   newLeads: number;
   hotLeads: number;
   calledLeads: number;
+}
+
+interface ChartData {
+  date: string;
+  leads: number;
+  contacted: number;
+  converted: number;
 }
 
 const Dashboard = () => {
@@ -23,6 +31,7 @@ const Dashboard = () => {
     hotLeads: 0,
     calledLeads: 0,
   });
+  const [chartData, setChartData] = useState<ChartData[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
@@ -34,6 +43,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (user) {
       fetchStats();
+      fetchChartData();
     }
   }, [user]);
 
@@ -116,6 +126,68 @@ const Dashboard = () => {
     }
   };
 
+  const fetchChartData = async () => {
+    try {
+      // Get leads from the last 7 days
+      const days = 7;
+      const chartDataArray: ChartData[] = [];
+
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        date.setHours(0, 0, 0, 0);
+        
+        const nextDate = new Date(date);
+        nextDate.setDate(nextDate.getDate() + 1);
+
+        // Build base queries with role-based filtering
+        let leadsQuery = supabase
+          .from("leads")
+          .select("*", { count: "exact", head: true })
+          .gte("created_at", date.toISOString())
+          .lt("created_at", nextDate.toISOString());
+
+        let contactedQuery = supabase
+          .from("leads")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "contacted")
+          .gte("created_at", date.toISOString())
+          .lt("created_at", nextDate.toISOString());
+
+        let convertedQuery = supabase
+          .from("leads")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "converted")
+          .gte("created_at", date.toISOString())
+          .lt("created_at", nextDate.toISOString());
+
+        // If user is a manager, filter by assigned leads
+        if (isManager && !isSuperadmin && !isAdmin) {
+          leadsQuery = leadsQuery.eq("assigned_manager_id", user?.id);
+          contactedQuery = contactedQuery.eq("assigned_manager_id", user?.id);
+          convertedQuery = convertedQuery.eq("assigned_manager_id", user?.id);
+        }
+
+        const [{ count: leadsCount }, { count: contactedCount }, { count: convertedCount }] = await Promise.all([
+          leadsQuery,
+          contactedQuery,
+          convertedQuery,
+        ]);
+
+        chartDataArray.push({
+          date: date.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+          leads: leadsCount || 0,
+          contacted: contactedCount || 0,
+          converted: convertedCount || 0,
+        });
+      }
+
+      setChartData(chartDataArray);
+    } catch (error) {
+      console.error("Error fetching chart data:", error);
+    }
+  };
+
   if (loading || statsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -183,6 +255,57 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Leads Overview - Last 7 Days</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="date" 
+                  className="text-xs"
+                  tick={{ fill: "currentColor" }}
+                />
+                <YAxis 
+                  className="text-xs"
+                  tick={{ fill: "currentColor" }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: "hsl(var(--background))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "6px"
+                  }}
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="leads" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={2}
+                  name="New Leads"
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="contacted" 
+                  stroke="hsl(var(--chart-2))" 
+                  strokeWidth={2}
+                  name="Contacted"
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="converted" 
+                  stroke="hsl(var(--chart-3))" 
+                  strokeWidth={2}
+                  name="Converted"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );

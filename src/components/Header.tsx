@@ -10,15 +10,15 @@ import Logo from "@/assets/logo.png";
 const navMenu = [
   {
     name: "Supported Living",
-    link: "/supportedliving",
+    link: "https://vivid-care.vercel.app/supportedliving",
   },
   {
     name: "Domiciliary Care",
-    link: "/domcare",
+    link: "https://vivid-care.vercel.app/domcare",
   },
   {
     name: "Careers",
-    link: "#",
+    link: "/",
   },
 ];
 

@@ -211,47 +211,47 @@ const Dashboard = () => {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0">
+          <Card className="bg-gradient-to-br from-blue-300 to-blue-400 text-blue-900 border-0">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Total Leads</CardTitle>
-              <Users className="h-4 w-4 text-white/80" />
+              <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
+              <Users className="h-4 w-4 opacity-70" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalLeads}</div>
-              <p className="text-xs text-white/80">All time</p>
+              <p className="text-xs opacity-70">All time</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-cyan-500 to-cyan-600 text-white border-0">
+          <Card className="bg-gradient-to-br from-cyan-300 to-cyan-400 text-cyan-900 border-0">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">New Leads</CardTitle>
-              <UserCheck className="h-4 w-4 text-white/80" />
+              <CardTitle className="text-sm font-medium">New Leads</CardTitle>
+              <UserCheck className="h-4 w-4 opacity-70" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.newLeads}</div>
-              <p className="text-xs text-white/80">This month</p>
+              <p className="text-xs opacity-70">This month</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-orange-500 to-red-500 text-white border-0">
+          <Card className="bg-gradient-to-br from-orange-300 to-red-400 text-orange-900 border-0">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Hot Leads</CardTitle>
-              <Flame className="h-4 w-4 text-white/80" />
+              <CardTitle className="text-sm font-medium">Hot Leads</CardTitle>
+              <Flame className="h-4 w-4 opacity-70" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.hotLeads}</div>
-              <p className="text-xs text-white/80">Requires attention</p>
+              <p className="text-xs opacity-70">Requires attention</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-500 to-emerald-600 text-white border-0">
+          <Card className="bg-gradient-to-br from-green-300 to-emerald-400 text-green-900 border-0">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Called</CardTitle>
-              <Phone className="h-4 w-4 text-white/80" />
+              <CardTitle className="text-sm font-medium">Called</CardTitle>
+              <Phone className="h-4 w-4 opacity-70" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.calledLeads}</div>
-              <p className="text-xs text-white/80">This week</p>
+              <p className="text-xs opacity-70">This week</p>
             </CardContent>
           </Card>
         </div>

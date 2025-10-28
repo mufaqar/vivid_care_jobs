@@ -249,7 +249,9 @@ export const LeadDetailsDialog = ({
               </div>
               <div>
                 <Label className="text-muted-foreground">Phone</Label>
-                <p className="font-medium">{lead.contact_phone}</p>
+                <a href={`tel:${lead.contact_phone}`} className="font-medium text-primary hover:underline cursor-pointer">
+                  {lead.contact_phone}
+                </a>
               </div>
               {lead.postal_code && (
                 <div>

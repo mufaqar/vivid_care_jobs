@@ -55,7 +55,7 @@ const Header: React.FC = () => {
         {/* ✅ Logo */}
         <div>
           <a
-            href="/"
+            href="https://vivid-care.vercel.app/"
             className="inline-flex w-fit group"
             onMouseEnter={() => setIsLogoHovered(true)}
             onMouseLeave={() => setIsLogoHovered(false)}

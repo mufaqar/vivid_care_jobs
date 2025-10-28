@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Shield } from "lucide-react";
 import { z } from "zod";
+import { QRCodeSVG } from "qrcode.react";
 
 const authSchema = z.object({
   email: z.string()
@@ -50,6 +51,9 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaEnrollment, setMfaEnrollment] = useState<{ qr: string; secret: string; factorId: string } | null>(null);
+  const [verificationCode, setVerificationCode] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -156,17 +160,23 @@ const Auth = () => {
         setCompanyName("");
         setPostalCode("");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email: result.data.email,
           password: result.data.password,
         });
 
         if (error) throw error;
 
-        toast({
-          title: "Welcome back!",
-          description: "You have successfully signed in.",
-        });
+        // Check if user has MFA enrolled
+        const { data: factors } = await supabase.auth.mfa.listFactors();
+        
+        if (factors && factors.totp && factors.totp.length > 0) {
+          // User has MFA enrolled, show verification screen
+          setMfaRequired(true);
+        } else {
+          // No MFA enrolled, prompt user to enroll
+          await enrollMFA();
+        }
       }
     } catch (error: any) {
       toast({
@@ -174,10 +184,210 @@ const Auth = () => {
         title: "Error",
         description: error.message || "An error occurred during authentication.",
       });
+      setLoading(false);
+    }
+  };
+
+  const enrollMFA = async () => {
+    try {
+      const { data, error } = await supabase.auth.mfa.enroll({
+        factorType: 'totp',
+        friendlyName: 'Authenticator App'
+      });
+
+      if (error) throw error;
+
+      setMfaEnrollment({
+        qr: data.totp.qr_code,
+        secret: data.totp.secret,
+        factorId: data.id
+      });
+      
+      toast({
+        title: "2FA Setup Required",
+        description: "Scan the QR code with your authenticator app.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to setup 2FA.",
+      });
     } finally {
       setLoading(false);
     }
   };
+
+  const handleMFAVerification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (mfaEnrollment) {
+        // Verifying during enrollment
+        const { error } = await supabase.auth.mfa.challengeAndVerify({
+          factorId: mfaEnrollment.factorId,
+          code: verificationCode
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "2FA Enabled!",
+          description: "Two-factor authentication is now active.",
+        });
+        
+        // Clear MFA states and navigate to dashboard
+        setMfaEnrollment(null);
+        setVerificationCode("");
+        navigate("/dashboard");
+      } else {
+        // Verifying during login
+        const { data: factors } = await supabase.auth.mfa.listFactors();
+        if (!factors?.totp?.[0]) throw new Error("No MFA factor found");
+
+        const factorId = factors.totp[0].id;
+        
+        const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
+          factorId
+        });
+
+        if (challengeError) throw challengeError;
+
+        const { error: verifyError } = await supabase.auth.mfa.verify({
+          factorId,
+          challengeId: challenge.id,
+          code: verificationCode
+        });
+
+        if (verifyError) throw verifyError;
+
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+        });
+        
+        setMfaRequired(false);
+        setVerificationCode("");
+        navigate("/dashboard");
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Verification Failed",
+        description: error.message || "Invalid verification code.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Show MFA enrollment screen
+  if (mfaEnrollment) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Set Up 2-Factor Authentication
+            </CardTitle>
+            <CardDescription>
+              Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleMFAVerification} className="space-y-4">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="bg-white p-4 rounded-lg">
+                  <QRCodeSVG value={mfaEnrollment.qr} size={200} />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground mb-2">Or enter this code manually:</p>
+                  <code className="bg-muted px-3 py-1 rounded text-sm font-mono break-all">
+                    {mfaEnrollment.secret}
+                  </code>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="verificationCode">Verification Code</Label>
+                <Input
+                  id="verificationCode"
+                  type="text"
+                  placeholder="000000"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  required
+                  maxLength={6}
+                  pattern="[0-9]{6}"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Enter the 6-digit code from your authenticator app
+                </p>
+              </div>
+              <Button type="submit" className="w-full" disabled={loading || verificationCode.length !== 6}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Verify and Enable 2FA
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show MFA verification screen
+  if (mfaRequired) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              2-Factor Authentication
+            </CardTitle>
+            <CardDescription>
+              Enter the verification code from your authenticator app
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleMFAVerification} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="verificationCode">Verification Code</Label>
+                <Input
+                  id="verificationCode"
+                  type="text"
+                  placeholder="000000"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  required
+                  maxLength={6}
+                  pattern="[0-9]{6}"
+                  autoFocus
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading || verificationCode.length !== 6}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Verify
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  setMfaRequired(false);
+                  setVerificationCode("");
+                }}
+              >
+                Cancel
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">

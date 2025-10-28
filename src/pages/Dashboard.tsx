@@ -211,47 +211,47 @@ const Dashboard = () => {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
+          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-white">Total Leads</CardTitle>
+              <Users className="h-4 w-4 text-white/80" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalLeads}</div>
-              <p className="text-xs text-muted-foreground">All time</p>
+              <p className="text-xs text-white/80">All time</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gradient-to-br from-cyan-500 to-cyan-600 text-white border-0">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">New Leads</CardTitle>
-              <UserCheck className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-white">New Leads</CardTitle>
+              <UserCheck className="h-4 w-4 text-white/80" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.newLeads}</div>
-              <p className="text-xs text-muted-foreground">This month</p>
+              <p className="text-xs text-white/80">This month</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gradient-to-br from-orange-500 to-red-500 text-white border-0">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Hot Leads</CardTitle>
-              <Flame className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-white">Hot Leads</CardTitle>
+              <Flame className="h-4 w-4 text-white/80" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.hotLeads}</div>
-              <p className="text-xs text-muted-foreground">Requires attention</p>
+              <p className="text-xs text-white/80">Requires attention</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gradient-to-br from-green-500 to-emerald-600 text-white border-0">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Called</CardTitle>
-              <Phone className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-white">Called</CardTitle>
+              <Phone className="h-4 w-4 text-white/80" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.calledLeads}</div>
-              <p className="text-xs text-muted-foreground">This week</p>
+              <p className="text-xs text-white/80">This week</p>
             </CardContent>
           </Card>
         </div>
@@ -284,23 +284,26 @@ const Dashboard = () => {
                 <Line 
                   type="monotone" 
                   dataKey="leads" 
-                  stroke="hsl(var(--primary))" 
-                  strokeWidth={2}
+                  stroke="#3b82f6" 
+                  strokeWidth={3}
                   name="New Leads"
+                  dot={{ fill: "#3b82f6", r: 4 }}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="contacted" 
-                  stroke="hsl(var(--chart-2))" 
-                  strokeWidth={2}
+                  stroke="#06b6d4" 
+                  strokeWidth={3}
                   name="Contacted"
+                  dot={{ fill: "#06b6d4", r: 4 }}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="converted" 
-                  stroke="hsl(var(--chart-3))" 
-                  strokeWidth={2}
+                  stroke="#10b981" 
+                  strokeWidth={3}
                   name="Converted"
+                  dot={{ fill: "#10b981", r: 4 }}
                 />
               </LineChart>
             </ResponsiveContainer>

@@ -39,12 +39,62 @@ const SettingsPage = () => {
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
   const [usersNotifications, setUsersNotifications] = useState<UserNotificationSettings[]>([]);
   const [loadingNotifications, setLoadingNotifications] = useState(true);
+  const [require2FA, setRequire2FA] = useState(false);
+  const [loading2FA, setLoading2FA] = useState(false);
 
   useEffect(() => {
     if (isSuperadmin) {
       fetchUsersNotifications();
+      fetch2FASetting();
     }
   }, [isSuperadmin]);
+
+  const fetch2FASetting = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('system_settings')
+        .select('setting_value')
+        .eq('setting_key', 'require_2fa')
+        .single();
+
+      if (error) throw error;
+      setRequire2FA(data?.setting_value || false);
+    } catch (error) {
+      console.error('Error fetching 2FA setting:', error);
+    }
+  };
+
+  const handleToggle2FA = async (checked: boolean) => {
+    setLoading2FA(true);
+    try {
+      const { error } = await supabase
+        .from('system_settings')
+        .update({ 
+          setting_value: checked,
+          updated_by: user?.id 
+        })
+        .eq('setting_key', 'require_2fa');
+
+      if (error) throw error;
+
+      setRequire2FA(checked);
+      toast({
+        title: "2FA Settings Updated",
+        description: checked 
+          ? "Two-factor authentication is now required for all users"
+          : "Two-factor authentication is now optional",
+      });
+    } catch (error) {
+      console.error('Error updating 2FA setting:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update 2FA settings",
+      });
+    } finally {
+      setLoading2FA(false);
+    }
+  };
 
   const fetchUsersNotifications = async () => {
     setLoadingNotifications(true);
@@ -358,6 +408,27 @@ const SettingsPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {isSuperadmin && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <Shield className="h-4 w-4" />
+                          <Label>Require Two-Factor Authentication</Label>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Force all users to enable 2FA on login
+                        </p>
+                      </div>
+                      <Switch
+                        checked={require2FA}
+                        onCheckedChange={handleToggle2FA}
+                        disabled={loading2FA}
+                      />
+                    </div>
+                    <Separator />
+                  </>
+                )}
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label>Database Management</Label>

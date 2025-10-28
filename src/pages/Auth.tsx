@@ -167,15 +167,33 @@ const Auth = () => {
 
         if (error) throw error;
 
-        // Check if user has MFA enrolled
-        const { data: factors } = await supabase.auth.mfa.listFactors();
-        
-        if (factors && factors.totp && factors.totp.length > 0) {
-          // User has MFA enrolled, show verification screen
-          setMfaRequired(true);
+        // Check if 2FA is required system-wide
+        const { data: settings } = await supabase
+          .from('system_settings')
+          .select('setting_value')
+          .eq('setting_key', 'require_2fa')
+          .single();
+
+        const require2FA = settings?.setting_value || false;
+
+        if (require2FA) {
+          // Check if user has MFA enrolled
+          const { data: factors } = await supabase.auth.mfa.listFactors();
+          
+          if (factors && factors.totp && factors.totp.length > 0) {
+            // User has MFA enrolled, show verification screen
+            setMfaRequired(true);
+          } else {
+            // No MFA enrolled, prompt user to enroll
+            await enrollMFA();
+          }
         } else {
-          // No MFA enrolled, prompt user to enroll
-          await enrollMFA();
+          // 2FA not required, proceed to dashboard
+          toast({
+            title: "Welcome back!",
+            description: "You have successfully signed in.",
+          });
+          setLoading(false);
         }
       }
     } catch (error: any) {

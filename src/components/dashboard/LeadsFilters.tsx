@@ -87,7 +87,7 @@ export const LeadsFilters = ({ filters, onFiltersChange }: LeadsFiltersProps) =>
               <SelectItem value="all">All statuses</SelectItem>
               <SelectItem value="new">New</SelectItem>
               <SelectItem value="contacted">Contacted</SelectItem>
-              <SelectItem value="in_progress">In Progress</SelectItem>
+              <SelectItem value="working">Working</SelectItem>
               <SelectItem value="converted">Converted</SelectItem>
               <SelectItem value="closed">Closed</SelectItem>
             </SelectContent>

@@ -181,7 +181,7 @@ export const LeadDetailsDialog = ({
   const handleUpdateStatus = async (status: string) => {
     const { error } = await supabase
       .from("leads")
-      .update({ status: status as "new" | "contacted" | "in_progress" | "converted" | "closed" })
+      .update({ status: status as "new" | "contacted" | "working" | "converted" | "closed" })
       .eq("id", lead.id);
 
     if (error) {
@@ -306,7 +306,7 @@ export const LeadDetailsDialog = ({
                   <SelectContent>
                     <SelectItem value="new">New</SelectItem>
                     <SelectItem value="contacted">Contacted</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="working">Working</SelectItem>
                     <SelectItem value="converted">Converted</SelectItem>
                     <SelectItem value="closed">Closed</SelectItem>
                   </SelectContent>

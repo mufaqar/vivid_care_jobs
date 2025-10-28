@@ -101,7 +101,7 @@ export const LeadsTable = ({ filters, onLeadsCountChange }: LeadsTableProps) => 
 
       // Apply filters
       if (filters.status && filters.status !== "all") {
-        query = query.eq("status", filters.status as "new" | "contacted" | "in_progress" | "converted" | "closed");
+        query = query.eq("status", filters.status as "new" | "contacted" | "working" | "converted" | "closed");
       }
 
       if (filters.assignedManager && filters.assignedManager !== "all") {
@@ -168,7 +168,7 @@ export const LeadsTable = ({ filters, onLeadsCountChange }: LeadsTableProps) => 
     const colors: Record<string, string> = {
       new: "bg-blue-500",
       contacted: "bg-yellow-500",
-      in_progress: "bg-purple-500",
+      working: "bg-purple-500",
       converted: "bg-green-500",
       closed: "bg-gray-500",
     };
